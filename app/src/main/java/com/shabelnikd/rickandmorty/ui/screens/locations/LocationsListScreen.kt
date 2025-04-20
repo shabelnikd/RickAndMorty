@@ -1,4 +1,4 @@
-package com.shabelnikd.rickandmorty.ui.screens.characters
+package com.shabelnikd.rickandmorty.ui.screens.locations
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,7 +19,7 @@ import com.shabelnikd.rickandmorty.ui.vm.characters.CharactersScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CharactersListScreen(navController: NavController) {
+fun LocationsListScreen(navController: NavController) {
     val vm = koinViewModel<CharactersScreenVM>()
     val characters = vm.charactersPagingFlow.collectAsLazyPagingItems()
 

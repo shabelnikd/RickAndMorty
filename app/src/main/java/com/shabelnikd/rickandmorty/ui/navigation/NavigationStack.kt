@@ -21,18 +21,21 @@ fun NavigationStack() {
             CharactersListScreen(navController = navController)
         }
 
-        composable(
-            route = CharactersNav.CharacterDetailScreen.route + "?characterId={characterId}",
-            arguments = listOf(
-                navArgument("characterId") {
-                    type = NavType.IntType
-                    nullable = false
-                })
-        ) { backStackEntry ->
-            CharacterDetailScreen(
-                characterId = backStackEntry.arguments?.getInt("characterId") ?: 0
-            )
+        with(CharactersNav.CharacterDetailScreen) {
+            composable(
+                route = "$route?$argName={$argName}",
+                arguments = listOf(
+                    navArgument("$argName") {
+                        type = NavType.IntType
+                        nullable = false
+                    })
+            ) { backStackEntry ->
+                CharacterDetailScreen(
+                    characterId = backStackEntry.arguments?.getInt("$argName") ?: 0
+                )
+            }
         }
+
 
     }
 

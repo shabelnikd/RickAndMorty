@@ -20,7 +20,7 @@ data class CharacterDto(
     @SerialName("origin")
     val origin: OriginDto? = null,
     @SerialName("location")
-    val location: LocationDto? = null,
+    val characterLocation: CharacterLocationDto? = null,
     @SerialName("image")
     val image: String? = null,
     @SerialName("episode")

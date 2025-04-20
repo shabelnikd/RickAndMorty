@@ -1,4 +1,4 @@
-package com.shabelnikd.rickandmorty.data.datasource.network.api.characters
+package com.shabelnikd.rickandmorty.data.datasource.network.api.episodes
 
 
 import androidx.compose.ui.util.fastJoinToString
@@ -10,28 +10,30 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.http.HttpMethod
 import com.shabelnikd.rickandmorty.data.models.characters.CharacterResponseDto
+import com.shabelnikd.rickandmorty.data.models.episodes.EpisodeDto
+import com.shabelnikd.rickandmorty.data.models.episodes.EpisodeReponseDto
 
 
-class CharacterApiService(
+class EpisodeApiService(
     private val httpClient: HttpClient,
 ) {
 
-    suspend fun getCharacters(page: Int): Result<CharacterResponseDto> =
+    suspend fun getEpisodes(page: Int): Result<EpisodeReponseDto> =
         httpClient.makeRequest {
-            url("${BASE_URL}/character")
+            url("${BASE_URL}/episode")
             method = HttpMethod.Companion.Get
             parameter("page", page)
         }
 
-    suspend fun getCharacterById(characterId: Int): Result<CharacterDto> =
+    suspend fun getEpisodeById(episodeId: Int): Result<EpisodeDto> =
         httpClient.makeRequest {
-            url("${BASE_URL}/character/${characterId}")
+            url("${BASE_URL}/episode/${episodeId}")
             method = HttpMethod.Companion.Get
         }
 
-    suspend fun getCharactersByIds(charactersIds: List<Int>): Result<CharacterResponseDto> =
+    suspend fun getEpisodesByIds(episodesIds: List<Int>): Result<EpisodeReponseDto> =
         httpClient.makeRequest {
-            url("${BASE_URL}/character/${charactersIds.fastJoinToString(separator = ",", prefix = "[", postfix = "]")}")
+            url("${BASE_URL}/character/${episodesIds.fastJoinToString(separator = ",", prefix = "[", postfix = "]")}")
             method = HttpMethod.Companion.Get
         }
 

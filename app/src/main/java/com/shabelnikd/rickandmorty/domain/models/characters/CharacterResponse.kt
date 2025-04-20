@@ -1,6 +1,6 @@
 package com.shabelnikd.rickandmorty.domain.models.characters
 
-data class BaseResponse(
+data class CharacterResponse(
     val info: Info,
     val results: List<Character>
 )
