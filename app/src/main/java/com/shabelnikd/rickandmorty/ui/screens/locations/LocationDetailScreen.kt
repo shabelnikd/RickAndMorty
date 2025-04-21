@@ -29,59 +29,33 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
+import com.shabelnikd.rickandmorty.domain.models.locations.Location
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import com.shabelnikd.rickandmorty.ui.vm.characters.CharacterDetailScreenVM
+import com.shabelnikd.rickandmorty.ui.vm.locations.LocationDetailScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LocationDetailScreen(characterId: Int) {
-    val vm = koinViewModel<CharacterDetailScreenVM>()
+fun LocationDetailScreen(locationId: Int) {
+    val vm = koinViewModel<LocationDetailScreenVM>()
     val scope = rememberCoroutineScope()
-    val characterState by vm.characterState.collectAsStateWithLifecycle()
+    val locationState by vm.locationState.collectAsStateWithLifecycle()
 
     LaunchedEffect(scope) {
-        vm.getCharacterById(characterId = characterId)
+        vm.getLocationById(locationId = locationId)
     }
 
     Scaffold { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            when (characterState) {
-                is BaseViewModel.UiState.Success<Character> -> {
-                    val character =
-                        (characterState as BaseViewModel.UiState.Success<Character>).data
+            when (locationState) {
+                is BaseViewModel.UiState.Success<Location> -> {
+                    val location =
+                        (locationState as BaseViewModel.UiState.Success<Location>).data
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-
-                        val brush = remember {
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.LightGray,
-                                    Color.White
-                                )
-                            )
-                        }
-
-                        AsyncImage(
-                            model = character.image,
-                            contentDescription = "Character image",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .size(size = 300.dp)
-                                .clip(
-                                    shape = Shapes().small
-                                )
-                                .align(alignment = Alignment.CenterHorizontally)
-                                .border(
-                                    border = BorderStroke(
-                                        width = 2.dp,
-                                        brush = brush
-                                    ),
-                                    shape = Shapes().small
-                                )
-                        )
 
                         Column(
                             modifier = Modifier
@@ -93,59 +67,30 @@ fun LocationDetailScreen(characterId: Int) {
 
                             Row {
                                 Text(
-                                    text = "Имя персонажа: ",
+                                    text = "Название локации: ",
                                     fontStyle = FontStyle.Italic,
                                     style = textStyle
                                 )
-                                Text(text = character.name, style = textStyle)
+                                Text(text = location.name, style = textStyle)
                             }
 
                             Row {
                                 Text(
-                                    text = "Статус: ",
+                                    text = "Тип: ",
                                     fontStyle = FontStyle.Italic,
                                     style = textStyle
                                 )
-                                Text(text = character.status, style = textStyle)
+                                Text(text = location.type, style = textStyle)
                             }
 
                             Row {
                                 Text(
-                                    text = "Пол: ",
+                                    text = "Dimension: ",
                                     fontStyle = FontStyle.Italic,
                                     style = textStyle
                                 )
-                                Text(text = character.gender, style = textStyle)
+                                Text(text = location.dimension, style = textStyle)
                             }
-
-
-                            Row {
-                                Text(
-                                    text = "Раса: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.species, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Обитает: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.origin.name, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Локация: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.characterLocation.name, style = textStyle)
-                            }
-
                         }
                     }
 

@@ -29,59 +29,33 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
+import com.shabelnikd.rickandmorty.domain.models.episodes.Episode
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import com.shabelnikd.rickandmorty.ui.vm.characters.CharacterDetailScreenVM
+import com.shabelnikd.rickandmorty.ui.vm.episodes.EpisodeDetailScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun EpisodeDetailScreen(characterId: Int) {
-    val vm = koinViewModel<CharacterDetailScreenVM>()
+fun EpisodeDetailScreen(episodeId: Int) {
+    val vm = koinViewModel<EpisodeDetailScreenVM>()
     val scope = rememberCoroutineScope()
-    val characterState by vm.characterState.collectAsStateWithLifecycle()
+    val episodeState by vm.episodesState.collectAsStateWithLifecycle()
 
     LaunchedEffect(scope) {
-        vm.getCharacterById(characterId = characterId)
+        vm.getEpisodeById(episodeId = episodeId)
     }
 
     Scaffold { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            when (characterState) {
-                is BaseViewModel.UiState.Success<Character> -> {
-                    val character =
-                        (characterState as BaseViewModel.UiState.Success<Character>).data
+            when (episodeState) {
+                is BaseViewModel.UiState.Success<Episode> -> {
+                    val episode =
+                        (episodeState as BaseViewModel.UiState.Success<Episode>).data
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-
-                        val brush = remember {
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.LightGray,
-                                    Color.White
-                                )
-                            )
-                        }
-
-                        AsyncImage(
-                            model = character.image,
-                            contentDescription = "Character image",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .size(size = 300.dp)
-                                .clip(
-                                    shape = Shapes().small
-                                )
-                                .align(alignment = Alignment.CenterHorizontally)
-                                .border(
-                                    border = BorderStroke(
-                                        width = 2.dp,
-                                        brush = brush
-                                    ),
-                                    shape = Shapes().small
-                                )
-                        )
 
                         Column(
                             modifier = Modifier
@@ -93,59 +67,30 @@ fun EpisodeDetailScreen(characterId: Int) {
 
                             Row {
                                 Text(
-                                    text = "Имя персонажа: ",
+                                    text = "Название эпизода: ",
                                     fontStyle = FontStyle.Italic,
                                     style = textStyle
                                 )
-                                Text(text = character.name, style = textStyle)
+                                Text(text = episode.name, style = textStyle)
                             }
 
                             Row {
                                 Text(
-                                    text = "Статус: ",
+                                    text = "Эпизод: ",
                                     fontStyle = FontStyle.Italic,
                                     style = textStyle
                                 )
-                                Text(text = character.status, style = textStyle)
+                                Text(text = episode.episode, style = textStyle)
                             }
 
                             Row {
                                 Text(
-                                    text = "Пол: ",
+                                    text = "Дата выхода: ",
                                     fontStyle = FontStyle.Italic,
                                     style = textStyle
                                 )
-                                Text(text = character.gender, style = textStyle)
+                                Text(text = episode.airDate, style = textStyle)
                             }
-
-
-                            Row {
-                                Text(
-                                    text = "Раса: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.species, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Обитает: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.origin.name, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Локация: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.characterLocation.name, style = textStyle)
-                            }
-
                         }
                     }
 
