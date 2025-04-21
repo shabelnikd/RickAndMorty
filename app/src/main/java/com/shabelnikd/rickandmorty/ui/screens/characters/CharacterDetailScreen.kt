@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Shapes
@@ -16,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -27,28 +30,42 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
+import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
 import com.shabelnikd.rickandmorty.ui.vm.characters.CharacterDetailScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CharacterDetailScreen(characterId: Int) {
+fun CharacterDetailScreen(characterId: Int, navController: NavController) {
     val vm = koinViewModel<CharacterDetailScreenVM>()
     val scope = rememberCoroutineScope()
     val characterState by vm.characterState.collectAsStateWithLifecycle()
+    val characterNameState = remember { mutableStateOf("") }
 
     LaunchedEffect(scope) {
         vm.getCharacterById(characterId = characterId)
     }
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            CenteredTopBar(
+                text = characterNameState.value,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack
+            ) {
+                navController.popBackStack()
+            }
+        }
+    ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             when (characterState) {
                 is BaseViewModel.UiState.Success<Character> -> {
                     val character =
                         (characterState as BaseViewModel.UiState.Success<Character>).data
+
+                    characterNameState.value = character.name
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),

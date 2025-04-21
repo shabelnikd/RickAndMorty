@@ -28,7 +28,6 @@ fun CharactersListScreen(navController: NavController, bottomAppBar: @Composable
         topBar = {
             CenteredTopBar(
                 text = "Персонажи",
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack
             ) {
                 navController.navigateUp()
             }

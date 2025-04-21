@@ -9,6 +9,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -29,7 +31,6 @@ fun EpisodesListScreen(navController: NavController, bottomAppBar: @Composable (
         topBar = {
             CenteredTopBar(
                 text = "Эпизоды",
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack
             ) {
                 navController.navigateUp()
             }

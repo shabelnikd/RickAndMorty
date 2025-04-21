@@ -1,56 +1,61 @@
 package com.shabelnikd.rickandmorty.ui.screens.locations
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import com.shabelnikd.rickandmorty.domain.models.characters.Character
+import androidx.navigation.NavController
 import com.shabelnikd.rickandmorty.domain.models.locations.Location
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
-import com.shabelnikd.rickandmorty.ui.vm.characters.CharacterDetailScreenVM
+import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
 import com.shabelnikd.rickandmorty.ui.vm.locations.LocationDetailScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LocationDetailScreen(locationId: Int) {
+fun LocationDetailScreen(locationId: Int, navController: NavController) {
     val vm = koinViewModel<LocationDetailScreenVM>()
     val scope = rememberCoroutineScope()
     val locationState by vm.locationState.collectAsStateWithLifecycle()
+    val locationNameState = remember { mutableStateOf("") }
 
     LaunchedEffect(scope) {
         vm.getLocationById(locationId = locationId)
     }
 
-    Scaffold { innerPadding ->
+    Scaffold(
+        topBar = {
+            CenteredTopBar(
+                text = locationNameState.value,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack
+            ) {
+                navController.popBackStack()
+            }
+        }
+    ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             when (locationState) {
                 is BaseViewModel.UiState.Success<Location> -> {
                     val location =
                         (locationState as BaseViewModel.UiState.Success<Location>).data
+
+                    locationNameState.value = location.name
 
                     Column(
                         modifier = Modifier.fillMaxWidth(),

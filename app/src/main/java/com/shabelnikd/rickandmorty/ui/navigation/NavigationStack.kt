@@ -4,11 +4,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.shabelnikd.rickandmorty.R
 import com.shabelnikd.rickandmorty.ui.components.AppBottomBar
 import com.shabelnikd.rickandmorty.ui.screens.characters.CharacterDetailScreen
 import com.shabelnikd.rickandmorty.ui.screens.characters.CharactersListScreen
@@ -26,17 +29,17 @@ fun NavigationStack() {
         TopLevelRoute(
             name = "Персонажи",
             route = Screens.CharactersListScreen.route,
-            icon = Icons.AutoMirrored.Default.List
+            icon = ImageVector.vectorResource(R.drawable.ic_characters)
         ),
         TopLevelRoute(
             name = "Эпизоды",
             route = Screens.EpisodesListScreen.route,
-            icon = Icons.AutoMirrored.Default.List
+            icon = ImageVector.vectorResource(R.drawable.ic_episodes)
         ),
         TopLevelRoute(
             name = "Локации",
             route = Screens.LocationsListScreen.route,
-            icon = Icons.AutoMirrored.Default.List
+            icon = ImageVector.vectorResource(R.drawable.ic_locations)
         )
     )
 
@@ -48,7 +51,7 @@ fun NavigationStack() {
     }
 
     NavHost(
-        navController = navController, startDestination = Screens.EpisodesListScreen.route
+        navController = navController, startDestination = Screens.CharactersListScreen.route
     ) {
         composable(
             route = Screens.CharactersListScreen.route,
@@ -87,7 +90,8 @@ fun NavigationStack() {
                     })
             ) { backStackEntry ->
                 EpisodeDetailScreen(
-                    episodeId = backStackEntry.arguments?.getInt("$argName") ?: 0
+                    episodeId = backStackEntry.arguments?.getInt("$argName") ?: 0,
+                    navController = navController
                 )
             }
         }
@@ -101,7 +105,8 @@ fun NavigationStack() {
                     })
             ) { backStackEntry ->
                 LocationDetailScreen(
-                    locationId = backStackEntry.arguments?.getInt("$argName") ?: 0
+                    locationId = backStackEntry.arguments?.getInt("$argName") ?: 0,
+                    navController = navController
                 )
             }
         }
@@ -115,7 +120,8 @@ fun NavigationStack() {
                     })
             ) { backStackEntry ->
                 CharacterDetailScreen(
-                    characterId = backStackEntry.arguments?.getInt("$argName") ?: 0
+                    characterId = backStackEntry.arguments?.getInt("$argName") ?: 0,
+                    navController = navController
                 )
             }
         }

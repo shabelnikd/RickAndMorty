@@ -29,7 +29,6 @@ fun LocationsListScreen(navController: NavController, bottomAppBar: @Composable 
         topBar = {
             CenteredTopBar(
                 text = "Локации",
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack
             ) {
                 navController.navigateUp()
             }

@@ -10,15 +10,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CenteredTopBar(text: String, imageVector: ImageVector, onBackClick: () -> Unit) {
+fun CenteredTopBar(text: String, imageVector: ImageVector? = null, onBackClick: () -> Unit) {
     CenterAlignedTopAppBar(
         title = { Text(text) },
         navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = imageVector,
-                    contentDescription = "Button"
-                )
+            imageVector?.let {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = imageVector,
+                        contentDescription = "Button"
+                    )
+                }
             }
         }
     )
