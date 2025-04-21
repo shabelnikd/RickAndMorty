@@ -1,8 +1,6 @@
-package com.shabelnikd.rickandmorty.ui.vm.locations
+package com.shabelnikd.rickandmorty.ui.screens.locations.detail
 
-import com.shabelnikd.rickandmorty.data.repository.characters.CharactersRepository
 import com.shabelnikd.rickandmorty.data.repository.locations.LocationsRepository
-import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.domain.models.locations.Location
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

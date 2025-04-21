@@ -1,9 +1,6 @@
 package com.shabelnikd.rickandmorty.domain.models.episodes
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
 data class Episode(
 
     val id: Int, // 1

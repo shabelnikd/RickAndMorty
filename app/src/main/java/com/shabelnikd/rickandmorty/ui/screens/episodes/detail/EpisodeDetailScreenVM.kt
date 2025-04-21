@@ -1,8 +1,6 @@
-package com.shabelnikd.rickandmorty.ui.vm.episodes
+package com.shabelnikd.rickandmorty.ui.screens.episodes.detail
 
-import com.shabelnikd.rickandmorty.data.repository.characters.CharactersRepository
 import com.shabelnikd.rickandmorty.data.repository.edisodes.EpisodesRepository
-import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.domain.models.episodes.Episode
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

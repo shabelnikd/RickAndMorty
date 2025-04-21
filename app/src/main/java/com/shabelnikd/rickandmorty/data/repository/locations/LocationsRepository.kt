@@ -4,12 +4,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.shabelnikd.rickandmorty.data.datasource.network.api.characters.CharacterApiService
 import com.shabelnikd.rickandmorty.data.datasource.network.api.locations.LocationApiService
-import com.shabelnikd.rickandmorty.data.datasource.network.paging.characters.CharacterPageSource
 import com.shabelnikd.rickandmorty.data.datasource.network.paging.locations.LocationPageSource
 import com.shabelnikd.rickandmorty.data.mappers.toDomain
-import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.domain.models.locations.Location
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

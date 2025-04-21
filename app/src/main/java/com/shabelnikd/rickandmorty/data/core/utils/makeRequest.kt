@@ -51,6 +51,7 @@ suspend inline fun <reified S> HttpClient.makeRequest(
                         httpResponse.status.value,
                         errorBody
                     )
+
                     in 500..599 -> NetworkError.ServerError(
                         httpResponse.status.value,
                         errorBody
@@ -101,6 +102,7 @@ suspend inline fun <reified S> HttpClient.makeRequest(
                     )
                 }
             }
+
             is ServerResponseException -> {
                 val errorBody = try {
                     e.response.body<ApiErrorResponse>() // Пытаемся прочитать тело ошибки из исключения
@@ -109,10 +111,16 @@ suspend inline fun <reified S> HttpClient.makeRequest(
                     null
                 }
                 // ServerResponseException - это всегда 5xx ошибки
-                NetworkError.ServerError(e.response.status.value, errorBody, e) // Передаем оригинальное ServerResponseException как причину
+                NetworkError.ServerError(
+                    e.response.status.value,
+                    errorBody,
+                    e
+                ) // Передаем оригинальное ServerResponseException как причину
             }
             // Таймауты
-            is SocketTimeoutException, is ConnectTimeoutException, is TimeoutCancellationException -> NetworkError.Timeout(e) // Передаем исключение таймаута как причину
+            is SocketTimeoutException, is ConnectTimeoutException, is TimeoutCancellationException -> NetworkError.Timeout(
+                e
+            ) // Передаем исключение таймаута как причину
             // Ошибки ввода-вывода (часто нет сети)
             is IOException -> NetworkError.NoConnection(e) // Передаем IOException как причину
             // Любые другие непредвиденные исключения

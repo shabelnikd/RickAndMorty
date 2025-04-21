@@ -4,14 +4,12 @@ package com.shabelnikd.rickandmorty.data.datasource.network.api.locations
 import androidx.compose.ui.util.fastJoinToString
 import com.shabelnikd.rickandmorty.data.core.utils.makeRequest
 import com.shabelnikd.rickandmorty.data.datasource.network.api.BASE_URL
+import com.shabelnikd.rickandmorty.data.models.locations.LocationDto
+import com.shabelnikd.rickandmorty.data.models.locations.LocationResponseDto
 import io.ktor.client.HttpClient
 import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.http.HttpMethod
-import com.shabelnikd.rickandmorty.data.models.episodes.EpisodeDto
-import com.shabelnikd.rickandmorty.data.models.episodes.EpisodeReponseDto
-import com.shabelnikd.rickandmorty.data.models.locations.LocationDto
-import com.shabelnikd.rickandmorty.data.models.locations.LocationResponseDto
 
 
 class LocationApiService(
@@ -33,7 +31,15 @@ class LocationApiService(
 
     suspend fun getLocationsByIds(locationsIds: List<Int>): Result<LocationResponseDto> =
         httpClient.makeRequest {
-            url("${BASE_URL}/location/${locationsIds.fastJoinToString(separator = ",", prefix = "[", postfix = "]")}")
+            url(
+                "${BASE_URL}/location/${
+                    locationsIds.fastJoinToString(
+                        separator = ",",
+                        prefix = "[",
+                        postfix = "]"
+                    )
+                }"
+            )
             method = HttpMethod.Companion.Get
         }
 

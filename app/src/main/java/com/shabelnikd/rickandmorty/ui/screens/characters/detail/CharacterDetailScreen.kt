@@ -1,4 +1,4 @@
-package com.shabelnikd.rickandmorty.ui.screens.characters
+package com.shabelnikd.rickandmorty.ui.screens.characters.detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -35,7 +35,6 @@ import coil3.compose.AsyncImage
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
-import com.shabelnikd.rickandmorty.ui.vm.characters.CharacterDetailScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

@@ -2,8 +2,8 @@ package com.shabelnikd.rickandmorty.data.datasource.network.paging.characters
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.shabelnikd.rickandmorty.data.models.characters.CharacterDto
 import com.shabelnikd.rickandmorty.data.datasource.network.api.characters.CharacterApiService
+import com.shabelnikd.rickandmorty.data.models.characters.CharacterDto
 
 const val START_INDEX = 1
 

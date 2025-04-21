@@ -1,4 +1,4 @@
-package com.shabelnikd.rickandmorty.ui.screens.episodes
+package com.shabelnikd.rickandmorty.ui.screens.episodes.detail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,6 @@ import androidx.navigation.NavController
 import com.shabelnikd.rickandmorty.domain.models.episodes.Episode
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
-import com.shabelnikd.rickandmorty.ui.vm.episodes.EpisodeDetailScreenVM
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

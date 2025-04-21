@@ -1,9 +1,6 @@
 package com.shabelnikd.rickandmorty.domain.models.locations
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
 data class Location(
     val id: Int, // 1
     val name: String, // Earth (C-137)

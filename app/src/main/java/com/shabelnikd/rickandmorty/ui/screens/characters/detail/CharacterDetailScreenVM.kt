@@ -1,4 +1,4 @@
-package com.shabelnikd.rickandmorty.ui.vm.characters
+package com.shabelnikd.rickandmorty.ui.screens.characters.detail
 
 import com.shabelnikd.rickandmorty.data.repository.characters.CharactersRepository
 import com.shabelnikd.rickandmorty.domain.models.characters.Character

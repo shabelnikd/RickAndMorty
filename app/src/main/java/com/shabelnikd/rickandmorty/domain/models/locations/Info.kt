@@ -1,9 +1,6 @@
 package com.shabelnikd.rickandmorty.domain.models.locations
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
 data class Info(
     val count: Int, // 126
     val pages: Int, // 7
