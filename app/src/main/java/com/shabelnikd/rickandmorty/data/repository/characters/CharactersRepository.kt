@@ -38,13 +38,11 @@ class CharactersRepository(
     }
 
 
-    fun getCharacterById(characterId: Int): Flow<Result<Character>> =
-        flow {
-            emit(
-                api.getCharacterById(characterId = characterId).map { response ->
-                    response.toDomain()
-                })
-        }.flowOn(Dispatchers.IO)
+    suspend fun getCharacterById(characterId: Int): Result<Character> =
+        api.getCharacterById(characterId = characterId).map { response ->
+            response.toDomain()
+        }
+
 }
 
 //    suspend fun getCharactersByIds(charactersIds: List<Int>): Flow<Character> {

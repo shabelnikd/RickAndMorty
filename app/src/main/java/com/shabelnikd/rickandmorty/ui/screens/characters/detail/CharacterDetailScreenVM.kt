@@ -13,47 +13,89 @@ import coil3.request.SuccessResult
 import coil3.request.allowHardware
 import coil3.toBitmap
 import com.shabelnikd.rickandmorty.data.repository.characters.CharactersRepository
+import com.shabelnikd.rickandmorty.data.repository.characters.FavoriteCharactersRepositoryImpl
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import kotlin.math.max
 import kotlin.math.min
 
 @SuppressLint("StaticFieldLeak")
+@OptIn(ExperimentalCoroutinesApi::class)
 class CharacterDetailScreenVM(
     private val charactersRepository: CharactersRepository,
     private val imageLoader: ImageLoader,
-    private val context: Context
+    private val context: Context,
+    private val favoriteCharactersRepository: FavoriteCharactersRepositoryImpl
 ) : BaseViewModel(), KoinComponent {
 
-    private val _characterState =
-        MutableStateFlow<UiState<Character>>(UiState.NotLoaded)
-    val characterState = _characterState.asStateFlow()
+    private val _characterIdToLoad = MutableStateFlow<Int?>(null)
+
+    fun loadCharacterDetails(characterId: Int) {
+        _characterIdToLoad.value = characterId
+    }
+
+
+    val characterState: StateFlow<UiState<Character>> = _characterIdToLoad
+        .filterNotNull()
+        .distinctUntilChanged()
+        .flatMapLatest { id ->
+            favoriteCharactersRepository.isCharacterFavorite(id)
+                .distinctUntilChanged()
+                .onEach { isFav -> _isFavorite.value = isFav }
+                .launchIn(viewModelScope)
+
+            flow {
+                emit(UiState.Loading)
+                charactersRepository.getCharacterById(id)
+                    .onSuccess { character ->
+                        emit(UiState.Success(character))
+                        if (character.image.isNotEmpty()) {
+                            extractDominantColorFromImage(character.image)
+                        } else {
+                            _dominantColor.value = null
+                        }
+
+                    }.onFailure { throwable ->
+                        val errorMessage = throwable.localizedMessage ?: "Ошибка загрузки"
+                        emit(UiState.Error(errorMessage))
+                        _dominantColor.value = null
+                    }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            UiState.NotLoaded
+        )
+
+    private val _isFavorite = MutableStateFlow<Boolean?>(null)
+    val isFavorite = _isFavorite.asStateFlow()
 
     private val _dominantColor = MutableStateFlow<Color?>(null)
     val dominantColor = _dominantColor.asStateFlow()
 
-    fun getCharacterById(characterId: Int) {
-        collectFlow<Character>(
-            request = { charactersRepository.getCharacterById(characterId = characterId) },
-            stateFlow = _characterState,
-            onSuccess = { character ->
-                if (character.image.isNotEmpty()) {
-                    extractDominantColorFromImage(character.image)
-                } else {
-                    _dominantColor.value = null
-                }
-
-            },
-            onError = {
-                // TODO
+    fun toggleFavoriteStatus(characterId: Int, isCurrentlyFavorite: Boolean) {
+        viewModelScope.launch {
+            if (isCurrentlyFavorite) {
+                favoriteCharactersRepository.removeFavoriteCharacter(characterId)
+            } else {
+                favoriteCharactersRepository.addFavoriteCharacter(characterId)
             }
-        )
-
+        }
     }
 
 
@@ -103,7 +145,6 @@ class CharacterDetailScreenVM(
                     val darkThreshold = 0.3f
                     val targetLightnessValue = 0.5f
 
-                    Log.e("ALLSD", "LOL $currentLightness")
 
                     val adjustLightness = if (currentLightness > darkThreshold) {
                         currentLightness

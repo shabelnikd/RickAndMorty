@@ -20,7 +20,8 @@ val uiModule = module {
         CharacterDetailScreenVM(
             charactersRepository = get(),
             imageLoader = get(),
-            context = androidContext()
+            context = androidContext(),
+            favoriteCharactersRepository = get()
         )
     }
 

@@ -2,8 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
     kotlin("plugin.serialization") version "2.1.20"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -83,6 +83,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.core)
 
 
     // Kotlinx Serializer
@@ -110,5 +111,10 @@ dependencies {
     // Palette
     implementation(libs.androidx.palette.ktx)
 
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
 }

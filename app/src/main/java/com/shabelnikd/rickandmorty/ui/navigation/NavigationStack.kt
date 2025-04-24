@@ -1,6 +1,12 @@
 package com.shabelnikd.rickandmorty.ui.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -12,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.shabelnikd.rickandmorty.R
 import com.shabelnikd.rickandmorty.ui.components.AppBottomBar
+import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
 import com.shabelnikd.rickandmorty.ui.screens.characters.CharactersListScreen
 import com.shabelnikd.rickandmorty.ui.screens.characters.detail.CharacterDetailScreen
 import com.shabelnikd.rickandmorty.ui.screens.episodes.EpisodesListScreen
