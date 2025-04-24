@@ -2,7 +2,6 @@ package com.shabelnikd.rickandmorty.ui.screens.characters.detail
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewModelScope
 import androidx.palette.graphics.Palette

@@ -10,7 +10,6 @@ import com.shabelnikd.rickandmorty.data.mappers.toDomain
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 
