@@ -1,183 +1,126 @@
 package com.shabelnikd.rickandmorty.ui.screens.characters.detail
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
-import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
+import com.shabelnikd.rickandmorty.ui.components.LoadingIndicator
+import com.shabelnikd.rickandmorty.ui.components.StyledTextKeyValue
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CharacterDetailScreen(characterId: Int, navController: NavController) {
+fun CharacterDetailScreen(characterId: Int?, navController: NavController, modifier: Modifier) {
     val vm = koinViewModel<CharacterDetailScreenVM>()
-    val scope = rememberCoroutineScope()
     val characterState by vm.characterState.collectAsStateWithLifecycle()
-    val characterNameState = remember { mutableStateOf("") }
+    val dominantColor by vm.dominantColor.collectAsStateWithLifecycle()
 
-    LaunchedEffect(scope) {
-        vm.getCharacterById(characterId = characterId)
+    LaunchedEffect(characterId) {
+        characterId?.let {
+            vm.getCharacterById(characterId)
+        }
     }
 
-    Scaffold(
-        topBar = {
-            CenteredTopBar(
-                text = characterNameState.value,
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack
+    when (characterState) {
+        is BaseViewModel.UiState.Success<Character> -> {
+            val character =
+                (characterState as BaseViewModel.UiState.Success<Character>).data
+
+
+            Column(
+                modifier = modifier
+                    .background(Color.Transparent)
+                    .clip(MaterialTheme.shapes.small)
+                    .padding(16.dp)
+                    .clickable(onClick = {
+                        navController.popBackStack()
+                    }),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                navController.popBackStack()
-            }
-        }
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            when (characterState) {
-                is BaseViewModel.UiState.Success<Character> -> {
-                    val character =
-                        (characterState as BaseViewModel.UiState.Success<Character>).data
 
-                    characterNameState.value = character.name
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(alignment = Alignment.CenterHorizontally)
+                ) {
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    AsyncImage(
+                        model = character.image,
+                        contentDescription = "Character image",
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(shape = Shapes().small),
+                    )
+                }
 
-                        val brush = remember {
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.LightGray,
-                                    Color.White
-                                )
+                Spacer(modifier = Modifier.size(4.dp))
+
+                Column(
+                    modifier = Modifier.align(alignment = Alignment.End),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val attributes = mapOf<String, String>(
+                        "Имя: " to character.name,
+                        "Пол: " to character.gender,
+                        "Раса: " to character.species,
+                        "Статус: " to character.status,
+                        "Обитает: " to character.origin.name,
+                        "Локация: " to character.characterLocation.name
+                    )
+
+                    for ((key, value) in attributes) {
+                        takeUnless { value.lowercase() == "unknown" }?.let {
+                            StyledTextKeyValue(
+                                rowModifier = Modifier,
+                                key = key,
+                                value = value,
+                                color = dominantColor ?: Color.White
                             )
                         }
 
-                        AsyncImage(
-                            model = character.image,
-                            contentDescription = "Character image",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .size(size = 300.dp)
-                                .clip(
-                                    shape = Shapes().small
-                                )
-                                .align(alignment = Alignment.CenterHorizontally)
-                                .border(
-                                    border = BorderStroke(
-                                        width = 2.dp,
-                                        brush = brush
-                                    ),
-                                    shape = Shapes().small
-                                )
-                        )
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            val textStyle = MaterialTheme.typography.bodyLarge
-
-                            Row {
-                                Text(
-                                    text = "Имя персонажа: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.name, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Статус: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.status, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Пол: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.gender, style = textStyle)
-                            }
-
-
-                            Row {
-                                Text(
-                                    text = "Раса: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.species, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Обитает: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.origin.name, style = textStyle)
-                            }
-
-                            Row {
-                                Text(
-                                    text = "Локация: ",
-                                    fontStyle = FontStyle.Italic,
-                                    style = textStyle
-                                )
-                                Text(text = character.characterLocation.name, style = textStyle)
-                            }
-
-                        }
                     }
 
                 }
-
-                is BaseViewModel.UiState.NotLoaded -> {
-                    Text("Еще не загружено")
-                }
-
-                else -> {
-                    Text("Ошибка")
-                }
             }
+
         }
 
+        is BaseViewModel.UiState.NotLoaded -> {
+            Text("Еще не загружено")
+        }
+
+        is BaseViewModel.UiState.Loading -> {
+            LoadingIndicator()
+        }
+
+        else -> {
+            Text("Ошибка")
+        }
     }
-
-
 }
+
+
+

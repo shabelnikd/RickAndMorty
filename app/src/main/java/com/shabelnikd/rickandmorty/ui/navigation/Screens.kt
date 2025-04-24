@@ -3,7 +3,7 @@ package com.shabelnikd.rickandmorty.ui.navigation
 import androidx.compose.ui.graphics.vector.ImageVector
 
 
-sealed class Screens(val route: String, val argName: String? = null) {
+sealed class Screens(val route: String, val argName: String = "") {
 
     object CharactersListScreen : Screens(route = "characters_list_screen")
     object CharacterDetailScreen :

@@ -28,7 +28,7 @@ import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun EpisodeDetailScreen(episodeId: Int, navController: NavController) {
+fun EpisodeDetailScreen(episodeId: Int?, navController: NavController) {
     val vm = koinViewModel<EpisodeDetailScreenVM>()
     val scope = rememberCoroutineScope()
     val episodeState by vm.episodesState.collectAsStateWithLifecycle()
@@ -36,7 +36,10 @@ fun EpisodeDetailScreen(episodeId: Int, navController: NavController) {
 
 
     LaunchedEffect(scope) {
-        vm.getEpisodeById(episodeId = episodeId)
+        episodeId?.let {
+            vm.getEpisodeById(episodeId = episodeId)
+
+        }
     }
 
     Scaffold(

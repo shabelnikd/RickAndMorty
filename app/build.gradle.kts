@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.shabelnikd.rickandmorty"
-        minSdk = 29
+        minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -30,11 +30,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    
+
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -101,6 +101,14 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.network.cache.control)
+
+    // Haze
+    implementation(libs.haze)
+    implementation(libs.dev.haze.materials)
+
+
+    // Palette
+    implementation(libs.androidx.palette.ktx)
 
 
 }

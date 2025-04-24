@@ -35,5 +35,6 @@ fun LocationListItem(location: Location, onClick: () -> Unit) {
                 Text(text = "(${location.dimension})", style = MaterialTheme.typography.bodyMedium)
             }
         }
+
     }
 }

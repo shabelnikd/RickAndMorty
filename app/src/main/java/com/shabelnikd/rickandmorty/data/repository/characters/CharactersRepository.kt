@@ -21,13 +21,14 @@ class CharactersRepository(
         val page = Pager(
             config = PagingConfig(
                 pageSize = 20,
-                prefetchDistance = 3,
+                prefetchDistance = 2,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
                 CharacterPageSource(api)
             }
         )
+
 
         return page.flow.map { pagingData ->
             pagingData.map { characterDto ->

@@ -28,14 +28,16 @@ import com.shabelnikd.rickandmorty.ui.components.CenteredTopBar
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LocationDetailScreen(locationId: Int, navController: NavController) {
+fun LocationDetailScreen(locationId: Int?, navController: NavController) {
     val vm = koinViewModel<LocationDetailScreenVM>()
     val scope = rememberCoroutineScope()
     val locationState by vm.locationState.collectAsStateWithLifecycle()
     val locationNameState = remember { mutableStateOf("") }
 
     LaunchedEffect(scope) {
-        vm.getLocationById(locationId = locationId)
+        locationId?.let {
+            vm.getLocationById(locationId = locationId)
+        }
     }
 
     Scaffold(

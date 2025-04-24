@@ -1,11 +1,13 @@
 package com.shabelnikd.rickandmorty.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.shabelnikd.rickandmorty.R
@@ -40,7 +42,7 @@ fun NavigationStack() {
         )
     )
 
-    val bottomAppBar = @Composable {
+    val bottomBar = @Composable {
         AppBottomBar(
             navController = navController,
             topLevelRoutes = topLevelRoutes
@@ -55,7 +57,7 @@ fun NavigationStack() {
             content = {
                 CharactersListScreen(
                     navController = navController,
-                    bottomAppBar = bottomAppBar
+                    bottomBar = bottomBar
                 )
             })
 
@@ -64,7 +66,7 @@ fun NavigationStack() {
             content = {
                 EpisodesListScreen(
                     navController = navController,
-                    bottomAppBar = bottomAppBar
+                    bottomBar = bottomBar
                 )
             })
 
@@ -73,22 +75,42 @@ fun NavigationStack() {
             content = {
                 LocationsListScreen(
                     navController = navController,
-                    bottomAppBar = bottomAppBar
+                    bottomBar = bottomBar
                 )
             })
 
 
-        with(Screens.EpisodeDetailScreen) {
-
-            composable(
-                route = "$route?$argName={$argName}", arguments = listOf(
-                    navArgument("$argName") {
+        with(Screens.CharacterDetailScreen) {
+            dialog(
+                route = "$route/{$argName}",
+                arguments = listOf(
+                    navArgument(argName) {
                         type = NavType.IntType
                         nullable = false
+                        defaultValue = -1
                     })
             ) { backStackEntry ->
+                CharacterDetailScreen(
+                    characterId = backStackEntry.arguments?.getInt(argName),
+                    navController = navController,
+                    modifier = Modifier
+                )
+            }
+        }
+
+
+        with(Screens.EpisodeDetailScreen) {
+            dialog(
+                route = "$route/{$argName}",
+                arguments = listOf(
+                    navArgument(argName) {
+                        type = NavType.IntType
+                        nullable = false
+                        defaultValue = -1
+                    }),
+            ) { backStackEntry ->
                 EpisodeDetailScreen(
-                    episodeId = backStackEntry.arguments?.getInt("$argName") ?: 0,
+                    episodeId = backStackEntry.arguments?.getInt(argName),
                     navController = navController
                 )
             }
@@ -96,29 +118,16 @@ fun NavigationStack() {
 
         with(Screens.LocationDetailScreen) {
             composable(
-                route = "$route?$argName={$argName}", arguments = listOf(
-                    navArgument("$argName") {
+                route = "$route/{$argName}",
+                arguments = listOf(
+                    navArgument(argName) {
                         type = NavType.IntType
                         nullable = false
+                        defaultValue = -1
                     })
             ) { backStackEntry ->
                 LocationDetailScreen(
-                    locationId = backStackEntry.arguments?.getInt("$argName") ?: 0,
-                    navController = navController
-                )
-            }
-        }
-
-        with(Screens.CharacterDetailScreen) {
-            composable(
-                route = "$route?$argName={$argName}", arguments = listOf(
-                    navArgument("$argName") {
-                        type = NavType.IntType
-                        nullable = false
-                    })
-            ) { backStackEntry ->
-                CharacterDetailScreen(
-                    characterId = backStackEntry.arguments?.getInt("$argName") ?: 0,
+                    locationId = backStackEntry.arguments?.getInt(argName),
                     navController = navController
                 )
             }
