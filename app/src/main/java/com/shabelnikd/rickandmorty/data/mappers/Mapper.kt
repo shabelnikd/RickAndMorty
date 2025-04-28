@@ -6,15 +6,15 @@ import com.shabelnikd.rickandmorty.data.models.characters.CharacterLocationDto
 import com.shabelnikd.rickandmorty.data.models.characters.OriginDto
 import com.shabelnikd.rickandmorty.data.models.episodes.EpisodeDto
 import com.shabelnikd.rickandmorty.data.models.locations.LocationDto
-import com.shabelnikd.rickandmorty.domain.models.characters.Character
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterLocation
+import com.shabelnikd.rickandmorty.domain.models.characters.CharacterModel
 import com.shabelnikd.rickandmorty.domain.models.characters.Origin
 import com.shabelnikd.rickandmorty.domain.models.episodes.Episode
 import com.shabelnikd.rickandmorty.domain.models.locations.Location
 
 
-fun CharacterDto.toDomain(): Character {
-    return Character(
+fun CharacterDto.toDomain(): CharacterModel {
+    return CharacterModel(
         id = this.id ?: 0,
         name = this.name.orEmpty(),
         status = this.status.orEmpty(),

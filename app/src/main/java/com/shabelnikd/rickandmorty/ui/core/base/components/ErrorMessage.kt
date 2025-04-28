@@ -1,4 +1,4 @@
-package com.shabelnikd.rickandmorty.ui.components
+package com.shabelnikd.rickandmorty.ui.core.base.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,10 +13,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ErrorItem(
+fun ErrorMessage(
     message: String,
     modifier: Modifier = Modifier,
-    onClickRetry: () -> Unit
+    onClickRetry: () -> Unit = {}
 ) {
     Column(
         modifier = modifier.padding(16.dp),

@@ -28,7 +28,8 @@ val dataModule = module {
 
     single {
         FavoriteCharactersRepositoryImpl(
-            favoriteCharacterDao = get()
+            favoriteCharacterDao = get(),
+            apiService = get()
         )
     }
 }

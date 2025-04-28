@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.shabelnikd.rickandmorty.data.datasource.network.api.characters.CharacterApiService
 import com.shabelnikd.rickandmorty.data.models.characters.CharacterDto
+import com.shabelnikd.rickandmorty.data.models.characters.CharacterResponseDto
 
 const val START_INDEX = 1
 
@@ -12,25 +13,26 @@ class CharacterPageSource(
 ) : PagingSource<Int, CharacterDto>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CharacterDto> {
-        try {
-            val currentKey = params.key ?: START_INDEX
-            val response = api.getCharacters(currentKey)
+        val currentKey = params.key ?: START_INDEX
 
-            response.onSuccess { data ->
-                return LoadResult.Page(
-                    data = data.results.orEmpty(),
-                    prevKey = if (currentKey == START_INDEX) null else currentKey.minus(1),
-                    nextKey = data.info?.next?.let { currentKey.plus(1) }
-                )
-            }.onFailure { e ->
-                return LoadResult.Error(
-                    throwable = e
-                )
-            }
+        return try {
+            val response: Result<CharacterResponseDto> = api.getCharacters(currentKey)
+
+            response.fold(
+                onSuccess = { data ->
+                    LoadResult.Page(
+                        data = data.results.orEmpty(),
+                        prevKey = data.info?.prev?.let { currentKey.minus(1) },
+                        nextKey = data.info?.next?.let { currentKey.plus(1) }
+                    )
+                },
+                onFailure = { throwable ->
+                    LoadResult.Error(throwable = throwable)
+                }
+            )
         } catch (e: Exception) {
-            return LoadResult.Error(e)
+            LoadResult.Error(e)
         }
-        return LoadResult.Invalid()
     }
 
     override fun getRefreshKey(state: PagingState<Int, CharacterDto>): Int? {

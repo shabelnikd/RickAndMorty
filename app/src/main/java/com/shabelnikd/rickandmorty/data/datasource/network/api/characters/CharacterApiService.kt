@@ -29,7 +29,7 @@ class CharacterApiService(
             method = HttpMethod.Companion.Get
         }
 
-    suspend fun getCharactersByIds(charactersIds: List<Int>): Result<CharacterResponseDto> =
+    suspend fun getCharactersByIds(charactersIds: List<Int>): Result<List<CharacterDto>> =
         httpClient.makeRequest {
             url(
                 "${BASE_URL}/character/${

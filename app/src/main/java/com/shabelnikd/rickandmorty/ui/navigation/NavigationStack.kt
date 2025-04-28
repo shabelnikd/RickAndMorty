@@ -1,17 +1,14 @@
 package com.shabelnikd.rickandmorty.ui.navigation
 
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.shabelnikd.rickandmorty.R
-import com.shabelnikd.rickandmorty.ui.components.AppBottomBar
 import com.shabelnikd.rickandmorty.ui.screens.characters.CharactersListScreen
 import com.shabelnikd.rickandmorty.ui.screens.characters.detail.CharacterDetailScreen
 import com.shabelnikd.rickandmorty.ui.screens.episodes.EpisodesListScreen
@@ -20,44 +17,21 @@ import com.shabelnikd.rickandmorty.ui.screens.locations.LocationsListScreen
 import com.shabelnikd.rickandmorty.ui.screens.locations.detail.LocationDetailScreen
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationStack() {
+
     val navController = rememberNavController()
 
-    val topLevelRoutes = listOf<TopLevelRoute<String>>(
-        TopLevelRoute(
-            name = "Персонажи",
-            route = Screens.CharactersListScreen.route,
-            icon = ImageVector.vectorResource(R.drawable.ic_characters)
-        ),
-        TopLevelRoute(
-            name = "Эпизоды",
-            route = Screens.EpisodesListScreen.route,
-            icon = ImageVector.vectorResource(R.drawable.ic_episodes)
-        ),
-        TopLevelRoute(
-            name = "Локации",
-            route = Screens.LocationsListScreen.route,
-            icon = ImageVector.vectorResource(R.drawable.ic_locations)
-        )
-    )
-
-    val bottomBar = @Composable {
-        AppBottomBar(
-            navController = navController,
-            topLevelRoutes = topLevelRoutes
-        )
-    }
-
     NavHost(
-        navController = navController, startDestination = Screens.CharactersListScreen.route
+        navController = navController,
+        startDestination = Screens.CharactersListScreen.route
     ) {
         composable(
             route = Screens.CharactersListScreen.route,
             content = {
                 CharactersListScreen(
-                    navController = navController,
-                    bottomBar = bottomBar
+                    navController = navController
                 )
             })
 
@@ -66,7 +40,6 @@ fun NavigationStack() {
             content = {
                 EpisodesListScreen(
                     navController = navController,
-                    bottomBar = bottomBar
                 )
             })
 
@@ -75,7 +48,6 @@ fun NavigationStack() {
             content = {
                 LocationsListScreen(
                     navController = navController,
-                    bottomBar = bottomBar
                 )
             })
 
@@ -91,7 +63,7 @@ fun NavigationStack() {
                     })
             ) { backStackEntry ->
                 CharacterDetailScreen(
-                    characterId = backStackEntry.arguments?.getInt(argName),
+                    characterId = backStackEntry.arguments?.getInt(argName) ?: -1,
                     navController = navController,
                     modifier = Modifier
                 )
@@ -110,14 +82,14 @@ fun NavigationStack() {
                     }),
             ) { backStackEntry ->
                 EpisodeDetailScreen(
-                    episodeId = backStackEntry.arguments?.getInt(argName),
+                    episodeId = backStackEntry.arguments?.getInt(argName) ?: -1,
                     navController = navController
                 )
             }
         }
 
         with(Screens.LocationDetailScreen) {
-            composable(
+            dialog(
                 route = "$route/{$argName}",
                 arguments = listOf(
                     navArgument(argName) {
@@ -127,7 +99,7 @@ fun NavigationStack() {
                     })
             ) { backStackEntry ->
                 LocationDetailScreen(
-                    locationId = backStackEntry.arguments?.getInt(argName),
+                    locationId = backStackEntry.arguments?.getInt(argName) ?: -1,
                     navController = navController
                 )
             }

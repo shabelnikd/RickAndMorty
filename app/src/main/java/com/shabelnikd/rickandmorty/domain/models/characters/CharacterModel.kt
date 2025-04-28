@@ -1,6 +1,6 @@
 package com.shabelnikd.rickandmorty.domain.models.characters
 
-data class Character(
+data class CharacterModel(
     val id: Int,
     val name: String,
     val status: String,

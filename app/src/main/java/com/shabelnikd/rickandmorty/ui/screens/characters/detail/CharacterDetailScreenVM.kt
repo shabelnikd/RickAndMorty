@@ -13,7 +13,7 @@ import coil3.request.allowHardware
 import coil3.toBitmap
 import com.shabelnikd.rickandmorty.data.repository.characters.CharactersRepository
 import com.shabelnikd.rickandmorty.data.repository.characters.FavoriteCharactersRepositoryImpl
-import com.shabelnikd.rickandmorty.domain.models.characters.Character
+import com.shabelnikd.rickandmorty.domain.models.characters.CharacterModel
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,7 +49,7 @@ class CharacterDetailScreenVM(
     }
 
 
-    val characterState: StateFlow<UiState<Character>> = _characterIdToLoad
+    val characterModelState: StateFlow<UiState<CharacterModel>> = _characterIdToLoad
         .filterNotNull()
         .distinctUntilChanged()
         .flatMapLatest { id ->

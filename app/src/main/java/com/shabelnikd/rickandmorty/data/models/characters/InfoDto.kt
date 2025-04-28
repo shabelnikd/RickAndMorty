@@ -12,5 +12,5 @@ data class InfoDto(
     @SerialName("next")
     val next: String? = null,
     @SerialName("prev")
-    val prev: String? = ""
+    val prev: String? = null,
 )

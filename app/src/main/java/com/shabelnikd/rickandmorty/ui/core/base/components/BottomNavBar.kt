@@ -1,13 +1,18 @@
-package com.shabelnikd.rickandmorty.ui.components
+package com.shabelnikd.rickandmorty.ui.core.base.components
 
 import android.annotation.SuppressLint
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarScrollBehavior
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -16,17 +21,23 @@ import androidx.navigation.navOptions
 import com.shabelnikd.rickandmorty.ui.navigation.TopLevelRoute
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RestrictedApi")
 @Composable
-fun AppBottomBar(
+fun BottomNavBar(
     navController: NavController,
-    topLevelRoutes: List<TopLevelRoute<String>>
+    modifier: Modifier = Modifier,
+    scrollBehavior: BottomAppBarScrollBehavior
 ) {
     val navBackStackEntryState = navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntryState.value?.destination
 
-    NavigationBar {
-        topLevelRoutes.forEach { item ->
+
+    BottomAppBar(
+        modifier = modifier,
+        scrollBehavior = scrollBehavior
+    ) {
+        TopLevelRoute.TopLevelRoutes.forEach { item ->
             val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
 
             NavigationBarItem(
@@ -42,7 +53,13 @@ fun AppBottomBar(
                     navController.navigate(item.route, navOptions)
                 },
                 icon = {
-                    Icon(imageVector = item.icon, contentDescription = item.name)
+                    ImageVector.runCatching {
+                        Icon(
+                            imageVector = vectorResource(item.iconResId),
+                            contentDescription = item.name
+                        )
+                    }
+
                 },
                 label = {
                     Text(item.name)
