@@ -2,7 +2,6 @@ package com.shabelnikd.rickandmorty.data.datasource.network.paging.characters
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import androidx.room.Query
 import com.shabelnikd.rickandmorty.data.datasource.network.api.characters.CharacterApiService
 import com.shabelnikd.rickandmorty.data.models.characters.CharacterDto
 import com.shabelnikd.rickandmorty.data.models.characters.CharacterResponseDto

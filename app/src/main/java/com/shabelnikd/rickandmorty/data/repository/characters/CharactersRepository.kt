@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
-import androidx.room.Query
 import com.shabelnikd.rickandmorty.data.datasource.network.api.characters.CharacterApiService
 import com.shabelnikd.rickandmorty.data.datasource.network.paging.characters.CharacterPageSource
 import com.shabelnikd.rickandmorty.data.mappers.toDomain
@@ -21,7 +20,7 @@ class CharactersRepository(
         val page = Pager(
             config = PagingConfig(
                 pageSize = 20,
-                prefetchDistance = 4,
+                prefetchDistance = 40,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {

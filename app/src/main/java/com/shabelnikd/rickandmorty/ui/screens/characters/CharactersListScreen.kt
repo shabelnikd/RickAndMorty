@@ -18,7 +18,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -35,7 +34,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.room.util.TableInfo
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterWithFavoriteStatus
 import com.shabelnikd.rickandmorty.ui.components.CharacterListItem
 import com.shabelnikd.rickandmorty.ui.components.FavoritesBottomSheetContent
@@ -43,9 +41,6 @@ import com.shabelnikd.rickandmorty.ui.core.base.components.CenteredTopBar
 import com.shabelnikd.rickandmorty.ui.core.base.components.ErrorMessage
 import com.shabelnikd.rickandmorty.ui.core.base.components.RefreshableScaffoldPagingList
 import com.shabelnikd.rickandmorty.ui.navigation.Screens
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

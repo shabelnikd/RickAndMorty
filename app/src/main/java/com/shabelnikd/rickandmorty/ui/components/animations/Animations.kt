@@ -68,7 +68,7 @@ fun Modifier.animationScale(
  * @param rotateDurationMillis Время анимации поворота
  * @param scaleDurationMillis Время анимации масштаба
  * @param alphaDurationMillis Время анимации прозрачности
- *
+ * @sample com.shabelnikd.rickandmorty.ui.core.base.components.BaseDetailScreen
  */
 fun Modifier.animationAlphaScaleRotateY(
     itemKey: Any,

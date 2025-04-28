@@ -21,7 +21,7 @@ class LocationsRepository(
         val page = Pager(
             config = PagingConfig(
                 pageSize = 20,
-                prefetchDistance = 3,
+                prefetchDistance = 40,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
