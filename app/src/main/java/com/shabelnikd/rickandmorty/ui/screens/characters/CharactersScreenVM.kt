@@ -10,6 +10,7 @@ import com.shabelnikd.rickandmorty.domain.models.characters.CharacterModel
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterWithFavoriteStatus
 import com.shabelnikd.rickandmorty.ui.base.BaseViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -84,17 +86,31 @@ class CharactersScreenVM(
             )
 
 
-    val charactersPagingFlow: Flow<PagingData<CharacterModel>> =
-        charactersRepository.getCharacters()
-            .cachedIn(viewModelScope)
-
     private val favoriteCharacterIdsFlow: Flow<List<Int>> =
         favoriteCharactersRepository.getAllFavoriteCharactersIds()
             .filterNotNull()
             .distinctUntilChanged()
 
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    @OptIn(FlowPreview::class)
+    private val charactersPagingFlowWithSearch: Flow<PagingData<CharacterModel>> =
+        searchQuery
+            
+            .debounce(700L)
+            .flatMapLatest { query ->
+                charactersRepository.getCharacters(query)
+            }
+            .cachedIn(viewModelScope)
+
     val charactersPagingFlowWithFavoriteStatus: Flow<PagingData<CharacterWithFavoriteStatus>> =
-        charactersPagingFlow
+        charactersPagingFlowWithSearch
             .combine(favoriteCharacterIdsFlow) { pagingData, favoriteIds ->
                 pagingData.map { characterModel ->
                     CharacterWithFavoriteStatus(

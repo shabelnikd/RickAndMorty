@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.Query
 import com.shabelnikd.rickandmorty.data.datasource.network.api.characters.CharacterApiService
 import com.shabelnikd.rickandmorty.data.datasource.network.paging.characters.CharacterPageSource
 import com.shabelnikd.rickandmorty.data.mappers.toDomain
@@ -16,7 +17,7 @@ import kotlinx.coroutines.flow.map
 class CharactersRepository(
     private val api: CharacterApiService
 ) {
-    fun getCharacters(): Flow<PagingData<CharacterModel>> {
+    fun getCharacters(query: String?): Flow<PagingData<CharacterModel>> {
         val page = Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -24,7 +25,7 @@ class CharactersRepository(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                CharacterPageSource(api)
+                CharacterPageSource(api, query)
             }
         )
 

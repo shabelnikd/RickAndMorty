@@ -16,11 +16,15 @@ class CharacterApiService(
     private val httpClient: HttpClient,
 ) {
 
-    suspend fun getCharacters(page: Int): Result<CharacterResponseDto> =
+    suspend fun getCharacters(page: Int, query: String?): Result<CharacterResponseDto> =
         httpClient.makeRequest {
             url("${BASE_URL}/character")
             method = HttpMethod.Companion.Get
             parameter("page", page)
+
+            if (!query.isNullOrBlank()) {
+                parameter("name", query)
+            }
         }
 
     suspend fun getCharacterById(characterId: Int): Result<CharacterDto> =
