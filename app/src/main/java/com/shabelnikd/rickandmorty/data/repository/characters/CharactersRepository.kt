@@ -16,7 +16,13 @@ import kotlinx.coroutines.flow.map
 class CharactersRepository(
     private val api: CharacterApiService
 ) {
-    fun getCharacters(query: String?): Flow<PagingData<CharacterModel>> {
+    fun getCharacters(
+        query: String?,
+        status: String?,
+        gender: String?,
+        species: String?,
+        type: String?
+    ): Flow<PagingData<CharacterModel>> {
         val page = Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -24,7 +30,7 @@ class CharactersRepository(
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                CharacterPageSource(api, query)
+                CharacterPageSource(api, query, status, gender, species, type)
             }
         )
 

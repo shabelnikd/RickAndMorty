@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterWithFavoriteStatus
+import com.shabelnikd.rickandmorty.ui.components.CharacterFilterSheetContent
 import com.shabelnikd.rickandmorty.ui.components.CharacterListItem
 import com.shabelnikd.rickandmorty.ui.components.FavoritesBottomSheetContent
 import com.shabelnikd.rickandmorty.ui.core.base.components.CenteredTopBar
@@ -52,10 +53,15 @@ fun CharactersListScreen(navController: NavController) {
     val vm = koinViewModel<CharactersScreenVM>()
     val characters = vm.charactersPagingFlowWithFavoriteStatus.collectAsLazyPagingItems()
 
-    val searchQuery by vm.searchQuery.collectAsStateWithLifecycle()
-
     val showFavoritesSheet by vm.showFavoritesSheet.collectAsStateWithLifecycle()
     val favoritesListState by vm.favoritesListState.collectAsStateWithLifecycle()
+    val showFilterSheet by vm.showFilterSheet.collectAsStateWithLifecycle()
+
+    val searchQuery by vm.searchQuery.collectAsStateWithLifecycle()
+    val statusFilter by vm.statusFilter.collectAsStateWithLifecycle()
+    val genderFilter by vm.genderFilter.collectAsStateWithLifecycle()
+    val speciesFilter by vm.speciesFilter.collectAsStateWithLifecycle()
+    val typeFilter by vm.typeFilter.collectAsStateWithLifecycle()
 
     var blur by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -87,11 +93,23 @@ fun CharactersListScreen(navController: NavController) {
     val topBar = @Composable {
         Column {
             CenteredTopBar(
-                text = "Персонажи", imageVector = Icons.Filled.Refresh, actions = {
+                text = "Персонажи",
+                imageVector = Icons.Filled.Refresh,
+                actions = {
                     IconButton(onClick = { vm.openFavoritesSheet() }) {
                         Icon(
                             imageVector = Icons.Filled.Favorite,
                             contentDescription = "Показать избранных"
+                        )
+                    }
+
+                    IconButton(onClick = {
+                        focusManager.clearFocus()
+                        vm.openFilterSheet()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Search,
+                            contentDescription = "Показать фильтры"
                         )
                     }
                 },
@@ -165,7 +183,6 @@ fun CharactersListScreen(navController: NavController) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScopeForSheet = rememberCoroutineScope()
 
-
     if (showFavoritesSheet) {
         ModalBottomSheet(
             onDismissRequest = { vm.closeFavoritesSheet() }, sheetState = sheetState
@@ -190,6 +207,37 @@ fun CharactersListScreen(navController: NavController) {
                     vm.toggleFavoriteStatus(characterId = characterId, isCurrentlyFavorite = true)
                 })
 
+        }
+    }
+
+
+    val sheetStateFilters = rememberModalBottomSheetState()
+    val coroutineScopeForSheetFilters = rememberCoroutineScope()
+
+    if (showFilterSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { vm.closeFilterSheet() },
+            sheetState = sheetStateFilters
+        ) {
+            CharacterFilterSheetContent(
+                status = statusFilter,
+                gender = genderFilter,
+                species = speciesFilter,
+                type = typeFilter,
+                onStatusChange = { vm.updateStatusFilter(it) },
+                onGenderChange = { vm.updateGenderFilter(it) },
+                onSpeciesChange = { vm.updateSpeciesFilter(it) },
+                onTypeChange = { vm.updateTypeFilter(it) },
+                onCloseSheet = {
+                    coroutineScopeForSheetFilters.launch {
+                        sheetStateFilters.hide()
+                    }.invokeOnCompletion {
+                        if (!sheetStateFilters.isVisible) {
+                            vm.closeFilterSheet()
+                        }
+                    }
+                }
+            )
         }
     }
 }

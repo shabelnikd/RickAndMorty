@@ -10,14 +10,19 @@ const val START_INDEX = 1
 
 class CharacterPageSource(
     private val api: CharacterApiService,
-    private val query: String?
+    private val query: String?,
+    private val status: String?,
+    private val gender: String?,
+    private val species: String?,
+    private val type: String?
 ) : PagingSource<Int, CharacterDto>() {
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CharacterDto> {
         val currentKey = params.key ?: START_INDEX
 
         return try {
-            val response: Result<CharacterResponseDto> = api.getCharacters(currentKey, query)
+            val response: Result<CharacterResponseDto> =
+                api.getCharacters(currentKey, query, status, gender, species, type)
 
             response.fold(
                 onSuccess = { data ->

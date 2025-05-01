@@ -16,31 +16,42 @@ class CharacterApiService(
     private val httpClient: HttpClient,
 ) {
 
-    suspend fun getCharacters(page: Int, query: String?): Result<CharacterResponseDto> =
-        httpClient.makeRequest {
-            url("${BASE_URL}/character")
-            method = HttpMethod.Companion.Get
-            parameter("page", page)
+    suspend fun getCharacters(
+        page: Int, query: String?, status: String?, gender: String?, species: String?, type: String?
+    ): Result<CharacterResponseDto> = httpClient.makeRequest {
+        url("${BASE_URL}/character")
+        method = HttpMethod.Companion.Get
+        parameter("page", page)
 
-            if (!query.isNullOrBlank()) {
-                parameter("name", query)
-            }
+        query.takeUnless { it.isNullOrBlank() }?.let {
+            parameter("name", it)
+        }
+        status.takeUnless { it.isNullOrBlank() }?.let {
+            parameter("status", it)
+        }
+        gender.takeUnless { it.isNullOrBlank() }?.let {
+            parameter("gender", it)
+        }
+        species.takeUnless { it.isNullOrBlank() }?.let {
+            parameter("species", it)
+        }
+        type.takeUnless { it.isNullOrBlank() }?.let {
+            parameter("type", it)
         }
 
-    suspend fun getCharacterById(characterId: Int): Result<CharacterDto> =
-        httpClient.makeRequest {
-            url("${BASE_URL}/character/${characterId}")
-            method = HttpMethod.Companion.Get
-        }
+    }
+
+    suspend fun getCharacterById(characterId: Int): Result<CharacterDto> = httpClient.makeRequest {
+        url("${BASE_URL}/character/${characterId}")
+        method = HttpMethod.Companion.Get
+    }
 
     suspend fun getCharactersByIds(charactersIds: List<Int>): Result<List<CharacterDto>> =
         httpClient.makeRequest {
             url(
                 "${BASE_URL}/character/${
                     charactersIds.fastJoinToString(
-                        separator = ",",
-                        prefix = "[",
-                        postfix = "]"
+                        separator = ",", prefix = "[", postfix = "]"
                     )
                 }"
             )

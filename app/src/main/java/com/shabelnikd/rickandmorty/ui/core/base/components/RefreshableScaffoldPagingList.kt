@@ -137,7 +137,7 @@ fun <T : Any> RefreshableScaffoldPagingList(
                         val item = items[index]
 
                         item?.let {
-                            itemsContent.invoke(this, item)
+                            itemsContent.invoke(this@items, item)
                         }
 
                     }
