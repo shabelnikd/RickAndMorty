@@ -47,7 +47,7 @@ fun FavoritesBottomSheetContent(
     ) {
         when (listState) {
             is UiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.fillMaxSize())
+//                LoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
             is UiState.Success<List<CharacterWithFavoriteStatus>> -> {
@@ -112,14 +112,14 @@ fun FavoritesBottomSheetContent(
             is UiState.Error -> {
                 val errorState = listState
                 ErrorMessage(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
                     message = "Ошибка загрузки избранного: ${errorState.message}",
-                    modifier = Modifier.fillMaxSize(),
                     onClickRetry = onClickRetry
                 )
             }
 
             is UiState.NotLoaded -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(contentAlignment = Alignment.Center) {
                     Text("Ожидание загрузки избранного...")
                 }
             }

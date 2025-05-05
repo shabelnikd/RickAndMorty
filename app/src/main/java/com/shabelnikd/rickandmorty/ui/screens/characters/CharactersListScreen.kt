@@ -85,7 +85,7 @@ fun CharactersListScreen(navController: NavController) {
     val coroutineScopeForSheetFilters = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+
     )
     val coroutineScopeForSheet = rememberCoroutineScope()
 
@@ -255,7 +255,7 @@ fun CharactersListScreen(navController: NavController) {
 
     if (showFavoritesSheet) {
         ModalBottomSheet(
-            modifier = Modifier.padding(top = ScaffoldDefaults.contentWindowInsets.getTop(density).dp),
+//            modifier = Modifier.padding(top = ScaffoldDefaults.contentWindowInsets.getTop(density).dp),
             onDismissRequest = {
                 blurEnabled = false
                 vm.closeFavoritesSheet()
