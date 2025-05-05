@@ -18,9 +18,10 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.shabelnikd.rickandmorty.domain.models.locations.Location
 import com.shabelnikd.rickandmorty.ui.components.LocationListItem
 import com.shabelnikd.rickandmorty.ui.components.SimpleShimmeringPlaceholder
-import com.shabelnikd.rickandmorty.ui.core.base.components.RefreshableScaffoldPagingList
 import com.shabelnikd.rickandmorty.ui.core.base.components.TopBar
+import com.shabelnikd.rickandmorty.ui.core.base.components.RefreshableScaffoldPagingList
 import com.shabelnikd.rickandmorty.ui.navigation.Screens
+
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

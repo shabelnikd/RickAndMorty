@@ -28,7 +28,10 @@ import com.shabelnikd.rickandmorty.domain.models.characters.CharacterModel
 import com.shabelnikd.rickandmorty.ui.components.FavoriteToggleButton
 import com.shabelnikd.rickandmorty.ui.core.base.components.BaseDetailScreen
 import com.shabelnikd.rickandmorty.ui.core.base.components.StyledTextKeyValueList
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.hazeSource
 import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
