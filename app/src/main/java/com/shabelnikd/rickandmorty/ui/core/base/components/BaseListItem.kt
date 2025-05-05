@@ -23,6 +23,7 @@ fun BaseListItem(
     animateInitialScale: Float = 0.9f,
     animateTargetScale: Float = 1.15f,
     durationMillis: Int = 400,
+    delayMillis: Long = 0L,
     onClick: () -> Unit,
     content: @Composable RowScope.() -> Unit
 ) {
@@ -34,6 +35,7 @@ fun BaseListItem(
             .animationScale(
                 itemKey = itemKey,
                 animate = animate,
+                delayMillis = delayMillis,
                 animateInitialScale = animateInitialScale,
                 animateTargetScale = animateTargetScale,
                 durationMillis = durationMillis

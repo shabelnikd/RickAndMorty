@@ -13,7 +13,7 @@ import com.shabelnikd.rickandmorty.R
 @Composable
 fun FavoriteToggleButton(isFavorite: Boolean, modifier: Modifier, onToggleFavorite: () -> Unit) {
 
-    val contentColor = Color(0xFF9C0303)
+    val contentColor = Color(0xBF9C0303)
 
     val unfilledIcon = @Composable {
         Icon(

@@ -3,11 +3,13 @@ package com.shabelnikd.rickandmorty.data.mappers
 
 import com.shabelnikd.rickandmorty.data.models.characters.CharacterDto
 import com.shabelnikd.rickandmorty.data.models.characters.CharacterLocationDto
+import com.shabelnikd.rickandmorty.data.models.characters.InfoDto
 import com.shabelnikd.rickandmorty.data.models.characters.OriginDto
 import com.shabelnikd.rickandmorty.data.models.episodes.EpisodeDto
 import com.shabelnikd.rickandmorty.data.models.locations.LocationDto
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterLocation
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterModel
+import com.shabelnikd.rickandmorty.domain.models.characters.Info
 import com.shabelnikd.rickandmorty.domain.models.characters.Origin
 import com.shabelnikd.rickandmorty.domain.models.episodes.Episode
 import com.shabelnikd.rickandmorty.domain.models.locations.Location
@@ -69,5 +71,14 @@ fun EpisodeDto.toDomain(): Episode {
         characters = this.characters.orEmpty(),
         url = this.url.orEmpty(),
         created = this.created.orEmpty()
+    )
+}
+
+fun InfoDto.toDomain(): Info {
+    return Info(
+        count = this.count ?: 0,
+        pages = this.pages ?: 0,
+        next = this.next,
+        prev = this.prev
     )
 }

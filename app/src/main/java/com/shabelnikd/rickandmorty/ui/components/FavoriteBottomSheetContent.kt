@@ -1,11 +1,14 @@
 package com.shabelnikd.rickandmorty.ui.components
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
@@ -26,7 +29,19 @@ fun FavoritesBottomSheetContent(
     onToggleFavorite: (Int, Boolean) -> Unit,
     onClickRetry: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+
+    val lazyListState = rememberLazyListState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = LinearOutSlowInEasing
+                )
+            )
+    ) {
         when (listState) {
             is UiState.Loading -> {
                 LoadingIndicator(modifier = Modifier.fillMaxSize())
@@ -40,11 +55,15 @@ fun FavoritesBottomSheetContent(
                         Text("Список избранного пуст")
                     }
                 } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                        state = lazyListState,
+
+                        ) {
                         items(
-                            items = favorites,
-                            key = { it.characterModel.id }
-                        ) { favoriteCharacterWithStatus ->
+                            count = favorites.size
+                        ) { index ->
+                            val favoriteCharacterWithStatus = favorites[index]
 
                             val dismissState = rememberSwipeToDismissBoxState(
                                 confirmValueChange = { dismissalValue ->
@@ -55,7 +74,6 @@ fun FavoritesBottomSheetContent(
                                     true
                                 }
                             )
-
 
                             SwipeToDismissBox(
                                 state = dismissState,

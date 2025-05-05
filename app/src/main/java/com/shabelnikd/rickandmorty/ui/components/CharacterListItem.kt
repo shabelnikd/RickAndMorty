@@ -22,6 +22,7 @@ import coil3.compose.AsyncImage
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterWithFavoriteStatus
 import com.shabelnikd.rickandmorty.ui.core.base.components.BaseListItem
 
+
 @Composable
 fun CharacterListItem(
     character: CharacterWithFavoriteStatus,
@@ -36,9 +37,11 @@ fun CharacterListItem(
         else -> Color(0xFF7B2589)
     }
 
+
     BaseListItem(
         itemKey = character.characterModel.id,
         modifier = modifier,
+        delayMillis = 0,
         animate = animate,
         onClick = onClick,
         animateInitialScale = 0.95f,

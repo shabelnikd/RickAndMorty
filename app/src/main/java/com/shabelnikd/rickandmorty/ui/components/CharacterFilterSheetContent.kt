@@ -15,6 +15,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +25,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.TextField as Material3TextField
 
@@ -39,8 +44,22 @@ fun CharacterFilterSheetContent(
     onTypeChange: (String?) -> Unit,
     onCloseSheet: () -> Unit
 ) {
-    val statusOptions = listOf(null, "alive", "dead", "unknown")
-    val genderOptions = listOf(null, "female", "male", "genderless", "unknown")
+    val statusOptions =
+        listOf<Pair<String?, String>>(
+            null to "Все",
+            "alive" to "Жив",
+            "dead" to "Мётрв",
+            "unknown" to "Неизвестно",
+        )
+    val genderOptions = listOf<Pair<String?, String>>(
+        null to "Любой",
+        "female" to "Женский",
+        "male" to "Мужской",
+        "genderless" to "Нет пола",
+        "unknown" to "Неизвестный",
+    )
+
+
 
 
     Column(
@@ -52,22 +71,40 @@ fun CharacterFilterSheetContent(
         Text(text = "Фильтры", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.size(16.dp))
 
-        FilterDropdown(
-            label = "Статус",
-            options = statusOptions,
-            selectedOption = status,
-            onOptionSelected = onStatusChange,
-            getOptionText = { option -> option ?: "Любой" }
+        Text("Статус", style = MaterialTheme.typography.titleSmall)
+        Spacer(
+            modifier = Modifier.size(8.dp)
         )
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            statusOptions.forEachIndexed { index, option ->
+                SegmentedButton(
+                    selected = status == option.first,
+                    onClick = { onStatusChange(option.first) },
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = statusOptions.size
+                    )
+                ) {
+                    Text(
+                        text = option.second,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
         Spacer(modifier = Modifier.size(16.dp))
 
 
+        Text("Пол", style = MaterialTheme.typography.titleSmall)
+        Spacer(modifier = Modifier.size(8.dp))
+
         FilterDropdown(
-            label = "Пол",
             options = genderOptions,
             selectedOption = gender,
             onOptionSelected = onGenderChange,
-            getOptionText = { option -> option ?: "Любой" }
         )
         Spacer(modifier = Modifier.size(16.dp))
 
@@ -100,13 +137,13 @@ fun CharacterFilterSheetContent(
 )
 @Composable
 fun <T> FilterDropdown(
-    label: String,
-    options: List<T>,
+    options: List<Pair<T, String>>,
     selectedOption: T,
     onOptionSelected: (T) -> Unit,
-    getOptionText: (T) -> String
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val selectedDisplayText = options.find { it.first == selectedOption }?.second ?: "Неизвестно"
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -114,10 +151,9 @@ fun <T> FilterDropdown(
         modifier = Modifier.fillMaxWidth()
     ) {
         Material3TextField(
-            value = getOptionText(selectedOption),
+            value = selectedDisplayText,
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             modifier = Modifier
@@ -127,13 +163,14 @@ fun <T> FilterDropdown(
 
         DropdownMenu(
             expanded = expanded,
+            offset = DpOffset(x = 0.dp, y = (-5).dp),
             onDismissRequest = { expanded = false }
         ) {
-            options.forEach { option ->
+            options.forEach { (value, text) ->
                 DropdownMenuItem(
-                    text = { Text(getOptionText(option)) },
+                    text = { Text(text) },
                     onClick = {
-                        onOptionSelected(option)
+                        onOptionSelected(value)
                         expanded = false
                     }
                 )

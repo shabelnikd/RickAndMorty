@@ -1,164 +1,175 @@
 package com.shabelnikd.rickandmorty.ui.core.base.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.shabelnikd.rickandmorty.ui.components.LoadingIndicator
+import com.shabelnikd.rickandmorty.ui.components.FabScrollTop
+import com.shabelnikd.rickandmorty.ui.components.ShimmeringCharacterPlaceholder
+import dev.chrisbanes.haze.HazeDefaults
+import dev.chrisbanes.haze.HazeLogger
+import dev.chrisbanes.haze.hazeEffect
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
+import dev.chrisbanes.haze.materials.HazeMaterials
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 fun <T : Any> RefreshableScaffoldPagingList(
     modifier: Modifier = Modifier,
-    blur: Boolean = false,
-    topBar: @Composable () -> Unit = {},
+    topBar: @Composable (Modifier) -> Unit = {},
     navController: NavController,
-    scrollBehaviorTop: TopAppBarScrollBehavior,
+    blurEnabled: Boolean = HazeDefaults.blurEnabled(),
     listState: LazyListState,
-    fab: @Composable () -> Unit = {},
-    emptyListItem: @Composable () -> Unit,
+    shimmerItem: (@Composable (Boolean) -> Unit)? = null,
+    getPaddingValues: (PaddingValues) -> Unit = {},
     items: LazyPagingItems<T>,
     itemsContent: @Composable LazyItemScope.(item: T) -> Unit,
 ) {
 
     val pullRefreshState = rememberPullToRefreshState()
+    val overscrollEffect = rememberOverscrollEffect()
     val scrollBehaviorBottom = BottomAppBarDefaults.exitAlwaysScrollBehavior()
 
+    val hazeStyle = HazeMaterials.ultraThin(MaterialTheme.colorScheme.surface).copy(
+        blurRadius = 16.dp,
+    )
 
-    val fabScaleInAnimationSpec: FiniteAnimationSpec<Float> = keyframes {
-        durationMillis = 2000
-        0.5f at 0
-        1.15f at 400
-        1f at 800
+    val dividerBrush = Brush.linearGradient(
+        colors = listOf<Color>(
+            Color.Transparent,
+            DividerDefaults.color
+        )
+    )
 
+    val bottomBar = @Composable
+    fun(modifier: Modifier) {
+        BottomNavBar(
+            navController = navController,
+            scrollBehavior = scrollBehaviorBottom,
+            modifier = modifier
+        )
     }
 
-    val fabEnterTransition: EnterTransition =
-        fadeIn(animationSpec = tween(durationMillis = 400)) + scaleIn(
-            animationSpec = fabScaleInAnimationSpec, initialScale = 0.5f
-        ) + slideInVertically(
-            initialOffsetY = { it / 2 }, animationSpec = tween(600)
-        )
+    val pullRefreshIndicator = @Composable {
+        Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            PullToRefreshDefaults.Indicator(
+                state = pullRefreshState,
+                isRefreshing = items.loadState.refresh is LoadState.Loading,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
 
+            LazyColumn {
+                items(count = 10) {
+                    shimmerItem?.let {
+                        it(items.loadState.refresh is LoadState.Loading)
+                    } ?: run {
+                        ShimmeringCharacterPlaceholder(items.loadState.refresh is LoadState.Loading)
 
-    val fabExitTransition: ExitTransition =
-        fadeOut(animationSpec = tween(durationMillis = 600))
+                    }
+                }
+            }
+        }
+    }
 
+    HazeLogger.enabled = true
 
     Scaffold(
         modifier = modifier
-            .nestedScroll(scrollBehaviorBottom.nestedScrollConnection)
-            .nestedScroll(scrollBehaviorTop.nestedScrollConnection)
             .then(
-                if (blur) {
-                    Modifier.blur(radius = 20.dp, edgeTreatment = BlurredEdgeTreatment.Rectangle)
+                if (blurEnabled) {
+                    Modifier.hazeEffect(style = hazeStyle)
                 } else {
                     Modifier
                 }
-            ),
-        contentWindowInsets = WindowInsets.safeDrawing,
-        topBar = topBar,
-        bottomBar = {
-            BottomNavBar(
-                navController = navController,
-                scrollBehavior = scrollBehaviorBottom
             )
-        },
-        floatingActionButton = {
-            AnimatedVisibility(
-                visible = listState.canScrollBackward,
-                enter = fabEnterTransition,
-                exit = fabExitTransition
-            ) {
-                fab()
-            }
+            .nestedScroll(scrollBehaviorBottom.nestedScrollConnection),
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets.safeDrawing,
+        topBar = { topBar(Modifier) },
+        bottomBar = { bottomBar(Modifier) },
+        floatingActionButton = { FabScrollTop(listState = listState) }
+    ) { innerPaddingValues ->
 
-        }
-    ) { innerPadding ->
+        getPaddingValues(innerPaddingValues)
 
         PullToRefreshBox(
             modifier = Modifier
-                .padding(innerPadding),
+                .padding(innerPaddingValues),
             isRefreshing = items.loadState.refresh is LoadState.Loading,
+            indicator = { pullRefreshIndicator() },
             onRefresh = { items.refresh() },
             state = pullRefreshState
         ) {
-            Column(modifier = Modifier) {
+            Column {
                 LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize(), state = listState
+                        .fillMaxSize(),
+                    state = listState,
+                    overscrollEffect = overscrollEffect
                 ) {
-                    when (items.loadState.refresh) {
-                        is LoadState.Error -> {
-                            val e = items.loadState.refresh as LoadState.Error
+                    with(items.loadState) {
+                        when (val e = refresh) {
+                            is LoadState.Error -> {
+                                item {
+                                    ErrorMessage(
+                                        message = e.error.localizedMessage ?: "Неизвестная ошибка",
+                                        modifier = Modifier.fillParentMaxSize(),
+                                        onClickRetry = { items.retry() })
+                                }
+                            }
+
+                            else -> {}
+                        }
+
+                        when (val e = append) {
+                            is LoadState.Error -> {
+                                item {
+                                    ErrorMessage(
+                                        message = "Ошибка при загрузке следующей страницы: ${e.error.localizedMessage ?: "Неизвестная ошибка"}",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        onClickRetry = { items.retry() })
+                                }
+                            }
+
+                            else -> {}
+                        }
+
+                        if (refresh is LoadState.NotLoading && append is LoadState.NotLoading && items.itemCount == 0) {
                             item {
                                 ErrorMessage(
-                                    message = "Ошибка при загрузке списка: ${e.error.localizedMessage ?: "Неизвестная ошибка"}",
-                                    modifier = Modifier.fillParentMaxSize(),
-                                    onClickRetry = { items.retry() })
-                            }
-                        }
-
-                        else -> {}
-                    }
-
-
-                    items(count = items.itemCount) { index ->
-                        val item = items[index]
-
-                        item?.let {
-                            itemsContent.invoke(this@items, item)
-                        }
-
-                    }
-
-
-                    when (items.loadState.append) {
-                        is LoadState.Loading -> {
-                            item {
-                                LoadingIndicator(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp)
-                                )
-                            }
-                        }
-
-                        is LoadState.Error -> {
-                            val e = items.loadState.append as LoadState.Error
-                            item {
-                                ErrorMessage(
-                                    message = "Ошибка при загрузке следующей страницы: ${e.error.localizedMessage ?: "Неизвестная ошибка"}",
+                                    message = "Ничего не найдено",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(16.dp),
@@ -166,20 +177,22 @@ fun <T : Any> RefreshableScaffoldPagingList(
                             }
                         }
 
-                        else -> {}
-                    }
+                        items(count = items.itemCount) { index ->
+                            items[index]?.let {
+                                itemsContent.invoke(this@items, it)
+                            }
 
-                    if (items.loadState.refresh is LoadState.NotLoading && items.loadState.append is LoadState.NotLoading && items.itemCount == 0) {
-                        item {
-                            emptyListItem()
+                            Spacer(
+                                modifier = Modifier
+                                    .padding(top = 12.dp)
+                                    .fillMaxWidth()
+                                    .size(0.6.dp)
+                                    .background(brush = dividerBrush)
+                            )
                         }
                     }
-
                 }
             }
         }
-
     }
-
-
 }

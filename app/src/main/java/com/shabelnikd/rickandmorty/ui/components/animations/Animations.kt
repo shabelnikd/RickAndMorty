@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -24,14 +25,26 @@ import kotlinx.coroutines.launch
 fun Modifier.animationScale(
     itemKey: Any,
     animate: Boolean = true,
+    onLaunch: Boolean = false,
     animateInitialScale: Float = 0.95f,
     animateTargetScale: Float = 1.15f,
     durationMillis: Int = 400,
+    delayMillis: Long = 0
 ): Modifier = composed {
     val scale = remember(itemKey) { Animatable(animateInitialScale) }
+    val alpha = remember(itemKey) { Animatable(0.7f) }
 
     LaunchedEffect(itemKey) {
         if (animate) {
+            delay(timeMillis = delayMillis)
+
+            launch {
+                alpha.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(1000)
+                )
+            }
+
             launch {
                 scale.animateTo(
                     targetValue = animateTargetScale,
@@ -42,12 +55,17 @@ fun Modifier.animationScale(
                     targetValue = 1f, animationSpec = tween(durationMillis = durationMillis)
                 )
             }
+        } else {
+            scale.snapTo(1f)
+            alpha.snapTo(1f)
         }
+
     }
 
     this.then(
         if (animate) {
             this.graphicsLayer {
+                this.alpha = alpha.value
                 this.scaleX = scale.value
                 this.scaleY = scale.value
             }

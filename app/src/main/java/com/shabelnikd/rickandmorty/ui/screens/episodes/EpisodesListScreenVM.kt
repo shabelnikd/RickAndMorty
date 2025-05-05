@@ -9,7 +9,7 @@ import com.shabelnikd.rickandmorty.domain.models.episodes.Episode
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 
-class EpisodesScreenVM(
+class EpisodesListScreenVM(
     episodesRepository: EpisodesRepository
 ) : ViewModel(), KoinComponent {
 

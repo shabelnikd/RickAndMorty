@@ -9,7 +9,7 @@ import com.shabelnikd.rickandmorty.domain.models.locations.Location
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 
-class LocationsScreenVM(
+class LocationsListScreenVM(
     locationsRepository: LocationsRepository
 ) : ViewModel(), KoinComponent {
 

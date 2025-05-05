@@ -15,23 +15,18 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CharactersScreenVM(
+class CharactersListScreenVM(
     charactersRepository: CharactersRepository,
     private val favoriteCharactersRepository: FavoriteCharactersRepositoryImpl
 ) : BaseViewModel(), KoinComponent {
@@ -68,59 +63,90 @@ class CharactersScreenVM(
     }
 
 
-    val favoritesListState =
-        _favoritesSheetVisible
-            .filterNotNull()
-            .distinctUntilChanged()
-            .flatMapLatest { isVisible ->
-                if (isVisible) {
-                    combine(
-                        favoriteCharactersRepository
-                            .getAllFavoriteCharactersIds()
-                            .filterNotNull()
-                            .distinctUntilChanged(),
-                        _favoritesListLoadRetryTrigger.onStart { emit(Unit) }
-                    ) { favoriteIds, _ -> favoriteIds }.flatMapLatest { favoriteIds ->
-                        flow {
-                            emit(UiState.Loading)
-                            val result =
-                                favoriteCharactersRepository.getFullFavoriteCharacters(favoriteIds)
-
-                            result.fold(
-                                onSuccess = { characters ->
-                                    val charactersWithStatus = characters.map { character ->
-                                        CharacterWithFavoriteStatus(
-                                            characterModel = character,
-                                            isFavorite = true
-                                        )
-                                    }
-                                    emit(UiState.Success(charactersWithStatus))
-                                },
-                                onFailure = { throwable ->
-                                    val errorMessage = throwable.localizedMessage ?: "Ошибка"
-                                    emit(UiState.Error(errorMessage))
-                                }
-                            )
-                        }
-                    }
-                } else {
-                    flowOf(UiState.NotLoaded as UiState<List<CharacterWithFavoriteStatus>>)
-                }
-            }.stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = UiState.NotLoaded
-            )
-
-
     private val favoriteCharacterIdsFlow: Flow<List<Int>> =
         favoriteCharactersRepository.getAllFavoriteCharactersIds()
             .filterNotNull()
-            .distinctUntilChanged()
 
 
-    private val _showImmediateLoading = MutableStateFlow(false)
-    val showImmediateLoading: StateFlow<Boolean> = _showImmediateLoading.asStateFlow()
+    private val _favoritesListState =
+        MutableStateFlow<UiState<List<CharacterWithFavoriteStatus>>>(UiState.NotLoaded)
+    val favoritesListState: StateFlow<UiState<List<CharacterWithFavoriteStatus>>> =
+        _favoritesListState.asStateFlow()
+
+
+    private var lastProcessedFavoriteIds: List<Int> = emptyList()
+
+
+    init {
+        viewModelScope.launch {
+            favoriteCharacterIdsFlow
+                .filterNotNull()
+                .combine(_favoritesListLoadRetryTrigger.onStart { emit(Unit) }) { favoriteIds, _ -> favoriteIds }
+                .collect { currentFavoriteIds ->
+
+                    val oldFavoriteIds = lastProcessedFavoriteIds
+                    lastProcessedFavoriteIds = currentFavoriteIds
+
+                    val addedIds = currentFavoriteIds.minus(oldFavoriteIds.toSet())
+                    val removedIds = oldFavoriteIds.minus(currentFavoriteIds.toSet())
+
+                    val currentCharacters =
+                        (_favoritesListState.value as? UiState.Success)?.data ?: emptyList()
+
+                    if (removedIds.isNotEmpty()) {
+                        val updatedList =
+                            currentCharacters.filter { it.characterModel.id !in removedIds }
+                        _favoritesListState.value = UiState.Success(updatedList)
+                    }
+
+                    val isInitialLoadOrRetry = oldFavoriteIds.isEmpty() || addedIds.isNotEmpty()
+
+                    if (isInitialLoadOrRetry) {
+                        _favoritesListState.value = UiState.Loading
+
+                        val result = favoriteCharactersRepository.getFullFavoriteCharacters(
+                            currentFavoriteIds
+                        )
+
+                        result.fold(
+                            onSuccess = { characters ->
+                                val charactersWithStatus = characters.map { character ->
+                                    CharacterWithFavoriteStatus(
+                                        characterModel = character,
+                                        isFavorite = true
+                                    )
+                                }
+                                _favoritesListState.value = UiState.Success(charactersWithStatus)
+                            },
+                            onFailure = { throwable ->
+                                val errorMessage =
+                                    throwable.localizedMessage ?: "Ошибка при загрузке избранных"
+                                _favoritesListState.value = UiState.Error(errorMessage)
+                            }
+                        )
+                    }
+                }
+        }
+    }
+
+
+    private val _totalCharacterCount = MutableStateFlow<Int>(-1)
+    val totalCharacterCount: StateFlow<Int> =
+        _totalCharacterCount.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            val result = charactersRepository.getCharacterTotalInfo()
+            result.fold(
+                onSuccess = { info ->
+                    _totalCharacterCount.value = info.count
+                },
+                onFailure = { throwable ->
+                    _totalCharacterCount.value = -1
+                }
+            )
+        }
+    }
 
 
     private val _searchQuery = MutableStateFlow("")
@@ -138,29 +164,25 @@ class CharactersScreenVM(
     private val _typeFilter = MutableStateFlow<String?>(null)
     val typeFilter: StateFlow<String?> = _typeFilter.asStateFlow()
 
+
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
-        _showImmediateLoading.value = true
     }
 
     fun updateStatusFilter(status: String?) {
         _statusFilter.value = status
-        _showImmediateLoading.value = true
     }
 
     fun updateGenderFilter(gender: String?) {
         _genderFilter.value = gender
-        _showImmediateLoading.value = true
     }
 
     fun updateSpeciesFilter(species: String?) {
         _speciesFilter.value = species
-        _showImmediateLoading.value = true
     }
 
     fun updateTypeFilter(type: String?) {
         _typeFilter.value = type
-        _showImmediateLoading.value = true
     }
 
 
@@ -181,7 +203,6 @@ class CharactersScreenVM(
         allFiltersFlow
             .debounce(700L)
             .flatMapLatest { filters ->
-                _showImmediateLoading.value = false
                 charactersRepository.getCharacters(
                     query = filters.query,
                     status = filters.status,

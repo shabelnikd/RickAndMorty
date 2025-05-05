@@ -6,14 +6,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,15 +28,19 @@ import com.shabelnikd.rickandmorty.domain.models.characters.CharacterModel
 import com.shabelnikd.rickandmorty.ui.components.FavoriteToggleButton
 import com.shabelnikd.rickandmorty.ui.core.base.components.BaseDetailScreen
 import com.shabelnikd.rickandmorty.ui.core.base.components.StyledTextKeyValueList
+import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
 @Composable
 fun CharacterDetailScreen(
     characterId: Int,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String = ""
 ) {
     val vm = koinViewModel<CharacterDetailScreenVM>()
+
 
     LaunchedEffect(characterId) {
         if (characterId != -1) {
@@ -51,6 +60,18 @@ fun CharacterDetailScreen(
         itemKey = characterId,
         itemState = characterState
     ) { item ->
+
+        if (!title.isEmpty()) {
+            CenterAlignedTopAppBar(
+                title = { Text(text = title) },
+                colors = TopAppBarDefaults.topAppBarColors().copy(
+                    containerColor = Color.Transparent
+                )
+
+            )
+        }
+
+
         Box(
             modifier = Modifier, contentAlignment = Alignment.BottomEnd
         ) {
@@ -77,6 +98,7 @@ fun CharacterDetailScreen(
             modifier = Modifier.align(alignment = Alignment.End),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
             StyledTextKeyValueList(
                 color = dominantColor ?: MaterialTheme.colorScheme.onBackground,
                 filterValue = "unknown",
@@ -97,3 +119,4 @@ fun CharacterDetailScreen(
         }
     }
 }
+

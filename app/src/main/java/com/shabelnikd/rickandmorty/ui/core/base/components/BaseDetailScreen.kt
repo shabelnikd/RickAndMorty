@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,10 @@ fun <T> BaseDetailScreen(
                     .background(
                         Color.Transparent, shape = MaterialTheme.shapes.small
                     )
-                    .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(16.dp),
+
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 content.invoke(this@Column, item)
             }

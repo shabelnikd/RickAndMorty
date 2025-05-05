@@ -1,22 +1,24 @@
 package com.shabelnikd.rickandmorty.ui.screens.characters
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -28,34 +30,62 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.shabelnikd.rickandmorty.R
 import com.shabelnikd.rickandmorty.domain.models.characters.CharacterWithFavoriteStatus
 import com.shabelnikd.rickandmorty.ui.components.CharacterFilterSheetContent
 import com.shabelnikd.rickandmorty.ui.components.CharacterListItem
 import com.shabelnikd.rickandmorty.ui.components.FavoritesBottomSheetContent
-import com.shabelnikd.rickandmorty.ui.core.base.components.CenteredTopBar
-import com.shabelnikd.rickandmorty.ui.core.base.components.ErrorMessage
 import com.shabelnikd.rickandmorty.ui.core.base.components.RefreshableScaffoldPagingList
+import com.shabelnikd.rickandmorty.ui.core.base.components.TopBar
 import com.shabelnikd.rickandmorty.ui.navigation.Screens
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun CharactersListScreen(navController: NavController) {
 
-    val vm = koinViewModel<CharactersScreenVM>()
+    val vm = koinViewModel<CharactersListScreenVM>()
+
+    val focusManager = LocalFocusManager.current
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val density = LocalDensity.current
+
     val characters = vm.charactersPagingFlowWithFavoriteStatus.collectAsLazyPagingItems()
+    val favoritesListState by vm.favoritesListState.collectAsStateWithLifecycle()
+    val totalCharacterCount by vm.totalCharacterCount.collectAsStateWithLifecycle()
 
     val showFavoritesSheet by vm.showFavoritesSheet.collectAsStateWithLifecycle()
-    val favoritesListState by vm.favoritesListState.collectAsStateWithLifecycle()
     val showFilterSheet by vm.showFilterSheet.collectAsStateWithLifecycle()
+
+    val sheetStateFilters = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScopeForSheetFilters = rememberCoroutineScope()
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+    val coroutineScopeForSheet = rememberCoroutineScope()
 
     val searchQuery by vm.searchQuery.collectAsStateWithLifecycle()
     val statusFilter by vm.statusFilter.collectAsStateWithLifecycle()
@@ -63,26 +93,32 @@ fun CharactersListScreen(navController: NavController) {
     val speciesFilter by vm.speciesFilter.collectAsStateWithLifecycle()
     val typeFilter by vm.typeFilter.collectAsStateWithLifecycle()
 
-    var blur by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    var blurEnabled by remember { mutableStateOf(false) }
 
     val listState = rememberLazyListState()
-    val focusManager = LocalFocusManager.current
 
     val animateList = remember { mutableStateOf(true) }
+
+    var scaffoldPaddingValues by remember { mutableStateOf(PaddingValues(0.dp)) }
+
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.dice))
+
+    var isDiceShow by remember { mutableStateOf(false) }
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        isPlaying = isDiceShow,
+        iterations = 1,
+        ignoreSystemAnimatorScale = true
+    )
 
     val scrollBehaviorTop = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
 
     LaunchedEffect(currentRoute) {
         if (currentRoute == Screens.CharactersListScreen.route) {
-            blur = false
+            blurEnabled = false
         }
     }
-
 
     LaunchedEffect(listState.isScrollInProgress) {
         if (listState.isScrollInProgress) {
@@ -90,42 +126,69 @@ fun CharactersListScreen(navController: NavController) {
         }
     }
 
-    val topBar = @Composable {
+    LaunchedEffect(isDiceShow, progress) {
+        if (isDiceShow && progress == 1f) {
+            with(Screens.CharacterDetailScreen) {
+                navController.navigate(
+                    route = "$route/${Random.nextInt(1..totalCharacterCount)}"
+                )
+            }
+            isDiceShow = false
+        }
+    }
+
+    val topBar = @Composable
+    fun(modifier: Modifier) {
         Column {
-            CenteredTopBar(
+            TopBar(
                 text = "Персонажи",
                 imageVector = Icons.Filled.Refresh,
+                modifier = modifier,
                 actions = {
-                    IconButton(onClick = { vm.openFavoritesSheet() }) {
-                        Icon(
-                            imageVector = Icons.Filled.Favorite,
-                            contentDescription = "Показать избранных"
-                        )
+                    val favoriteVector = ImageVector.vectorResource(R.drawable.ic_favorite_unfilled)
+                    val casinoVector = ImageVector.vectorResource(R.drawable.ic_casino)
+                    val tuneVector = ImageVector.vectorResource(R.drawable.ic_tune)
+
+                    val defaultAction = {
+                        focusManager.clearFocus()
+                        blurEnabled = true
                     }
 
                     IconButton(onClick = {
-                        focusManager.clearFocus()
+                        defaultAction()
+                        vm.openFavoritesSheet()
+                    }) {
+                        Icon(imageVector = favoriteVector, contentDescription = "favorites")
+                    }
+
+
+                    IconButton(onClick = {
+                        defaultAction()
+                        isDiceShow = true
+                    }) {
+                        Icon(imageVector = casinoVector, contentDescription = "random")
+                    }
+
+
+                    IconButton(onClick = {
+                        defaultAction()
                         vm.openFilterSheet()
                     }) {
-                        Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = "Показать фильтры"
-                        )
+                        Icon(imageVector = tuneVector, contentDescription = "filters")
                     }
                 },
-                modifier = Modifier,
-                scrollBehavior = scrollBehaviorTop
-            ) {
-                characters.refresh()
-            }
 
+                onBackClick = { characters.refresh() },
+
+                scrollBehavior = scrollBehaviorTop
+            )
 
             OutlinedTextField(
                 value = searchQuery,
-                onValueChange = { vm.updateSearchQuery(it) },
+                onValueChange = { value -> vm.updateSearchQuery(value) },
                 placeholder = { Text("Поиск персонажей по имени") },
                 leadingIcon = {
-                    Icon(Icons.Filled.Search, contentDescription = "Иконка поиска")
+                    Icon(Icons.Filled.Search, contentDescription = "Search")
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -133,70 +196,77 @@ fun CharactersListScreen(navController: NavController) {
                 singleLine = true,
             )
         }
-
     }
 
 
-    RefreshableScaffoldPagingList<CharacterWithFavoriteStatus>(
-        blur = blur,
-        topBar = {
-            topBar()
-        },
-        navController = navController,
-        items = characters,
-        listState = listState,
-        scrollBehaviorTop = scrollBehaviorTop,
-        emptyListItem = {
-            ErrorMessage("Персонажи не найдены")
-        },
-        fab = {
-            FloatingActionButton(onClick = {
-                coroutineScope.launch {
-                    listState.animateScrollToItem(0)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        RefreshableScaffoldPagingList<CharacterWithFavoriteStatus>(
+            navController = navController,
+            blurEnabled = blurEnabled,
+            topBar = { modifier ->
+                topBar(modifier)
+            },
+            modifier = Modifier
+                .nestedScroll(scrollBehaviorTop.nestedScrollConnection),
+
+            items = characters,
+            listState = listState,
+            getPaddingValues = { paddingValues ->
+                scaffoldPaddingValues = paddingValues
+            },
+        ) { item ->
+            CharacterListItem(
+                animate = animateList.value,
+                character = item,
+                onToggleFavorite = { id, isFavorite ->
+                    vm.toggleFavoriteStatus(item.characterModel.id, isFavorite)
+                }, modifier = Modifier.fillMaxWidth()
+            ) {
+                with(Screens.CharacterDetailScreen) {
+                    blurEnabled = true
+                    navController.navigate(route = "$route/${item.characterModel.id}")
                 }
-            }, shape = CircleShape) {
-                Icon(
-                    imageVector = Icons.Filled.KeyboardArrowUp, contentDescription = "Arrow Up"
-                )
-            }
-        }) { item ->
-
-
-        CharacterListItem(
-            animate = animateList.value,
-            character = item,
-            onToggleFavorite = { id, isFavorite ->
-                vm.toggleFavoriteStatus(item.characterModel.id, isFavorite)
-            }, modifier = Modifier.fillMaxWidth()
-        ) {
-            with(Screens.CharacterDetailScreen) {
-                blur = true
-                navController.navigate(route = "$route/${item.characterModel.id}")
             }
         }
 
-
-        HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 0.6.dp)
+        AnimatedVisibility(
+            visible = isDiceShow,
+        ) {
+            Column {
+                CenterAlignedTopAppBar(
+                    modifier = Modifier
+                        .padding(top = scaffoldPaddingValues.calculateTopPadding()),
+                    title = { Text("Кто ты из Rick & Morty?") },
+                    colors = TopAppBarDefaults.topAppBarColors().copy(
+                        containerColor = Color.Transparent
+                    )
+                )
+                LottieAnimation(composition = composition)
+            }
+        }
     }
 
 
-    val sheetState = rememberModalBottomSheetState()
-    val coroutineScopeForSheet = rememberCoroutineScope()
 
     if (showFavoritesSheet) {
         ModalBottomSheet(
-            onDismissRequest = { vm.closeFavoritesSheet() }, sheetState = sheetState
+            modifier = Modifier.padding(top = ScaffoldDefaults.contentWindowInsets.getTop(density).dp),
+            onDismissRequest = {
+                blurEnabled = false
+                vm.closeFavoritesSheet()
+            },
+            sheetState = sheetState
         ) {
             FavoritesBottomSheetContent(
                 listState = favoritesListState,
-
                 onCharacterClick = { characterId ->
                     coroutineScopeForSheet.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
                             vm.closeFavoritesSheet()
-
                             with(Screens.CharacterDetailScreen) {
-                                blur = true
                                 navController.navigate(route = "$route/$characterId")
                             }
                         }
@@ -211,12 +281,12 @@ fun CharactersListScreen(navController: NavController) {
     }
 
 
-    val sheetStateFilters = rememberModalBottomSheetState()
-    val coroutineScopeForSheetFilters = rememberCoroutineScope()
-
     if (showFilterSheet) {
         ModalBottomSheet(
-            onDismissRequest = { vm.closeFilterSheet() },
+            onDismissRequest = {
+                blurEnabled = false
+                vm.closeFilterSheet()
+            },
             sheetState = sheetStateFilters
         ) {
             CharacterFilterSheetContent(

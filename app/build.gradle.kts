@@ -41,6 +41,11 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+    google()
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -103,11 +108,6 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.network.cache.control)
 
-    // Haze
-    implementation(libs.haze)
-    implementation(libs.dev.haze.materials)
-
-
     // Palette
     implementation(libs.androidx.palette.ktx)
 
@@ -116,5 +116,17 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+
+    //Shimmer KMP
+    // https://github.com/valentinilk/compose-shimmer
+    implementation(libs.compose.shimmer)
+
+
+    // Lottie
+    implementation(libs.lottie.compose)
+
+    // Haze
+    implementation("dev.chrisbanes.haze:haze:1.6.0-beta03")
+    implementation("dev.chrisbanes.haze:haze-materials:1.6.0-beta03")
 
 }
