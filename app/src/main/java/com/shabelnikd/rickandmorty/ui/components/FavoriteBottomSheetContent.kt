@@ -5,18 +5,19 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ fun FavoritesBottomSheetContent(
 ) {
 
     val lazyListState = rememberLazyListState()
+    var lastListCount by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -47,22 +49,35 @@ fun FavoritesBottomSheetContent(
     ) {
         when (listState) {
             is UiState.Loading -> {
+
+                LazyColumn {
+                    items(count = lastListCount) {
+                        ShimmeringCharacterPlaceholder(true)
+                    }
+                }
+
 //                LoadingIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
             is UiState.Success<List<CharacterWithFavoriteStatus>> -> {
                 val favorites = listState.data
+                lastListCount = favorites.size
 
                 if (favorites.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight(0.5f)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Text("Список избранного пуст")
                     }
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),
-                        state = lazyListState,
-
-                        ) {
+                        state = lazyListState
+                    ) {
                         items(
                             count = favorites.size
                         ) { index ->
@@ -119,7 +134,7 @@ fun FavoritesBottomSheetContent(
             }
 
             is UiState.NotLoaded -> {
-                Box(contentAlignment = Alignment.Center) {
+                Box(contentAlignment = Alignment.TopCenter) {
                     Text("Ожидание загрузки избранного...")
                 }
             }

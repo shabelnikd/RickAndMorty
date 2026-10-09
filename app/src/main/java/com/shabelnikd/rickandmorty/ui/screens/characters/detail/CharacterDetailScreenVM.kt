@@ -51,7 +51,6 @@ class CharacterDetailScreenVM(
 
     val characterModelState: StateFlow<UiState<CharacterModel>> = _characterIdToLoad
         .filterNotNull()
-        .distinctUntilChanged()
         .flatMapLatest { id ->
             favoriteCharactersRepository.isCharacterFavorite(id)
                 .distinctUntilChanged()

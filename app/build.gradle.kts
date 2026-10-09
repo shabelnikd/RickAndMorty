@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.shabelnikd.rickandmorty"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.shabelnikd.rickandmorty"
         minSdk = 31
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -126,7 +126,9 @@ dependencies {
     implementation(libs.lottie.compose)
 
     // Haze
-    implementation("dev.chrisbanes.haze:haze:1.6.0-beta03")
-    implementation("dev.chrisbanes.haze:haze-materials:1.6.0-beta03")
+    implementation(libs.haze)
+    implementation(libs.haze.materials)
+
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
 }

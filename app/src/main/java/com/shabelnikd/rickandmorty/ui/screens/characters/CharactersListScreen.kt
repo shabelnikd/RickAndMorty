@@ -208,6 +208,9 @@ fun CharactersListScreen(navController: NavController) {
         RefreshableScaffoldPagingList<CharacterWithFavoriteStatus>(
             navController = navController,
             blurEnabled = blurEnabled,
+            onRefresh = {
+                blurEnabled = true
+            },
             topBar = { modifier ->
                 topBar(modifier)
             },

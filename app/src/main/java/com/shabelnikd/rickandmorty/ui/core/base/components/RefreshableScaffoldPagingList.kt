@@ -53,6 +53,7 @@ fun <T : Any> RefreshableScaffoldPagingList(
     shimmerItem: (@Composable (Boolean) -> Unit)? = null,
     getPaddingValues: (PaddingValues) -> Unit = {},
     items: LazyPagingItems<T>,
+    onRefresh: () -> Unit = {},
     itemsContent: @Composable LazyItemScope.(item: T) -> Unit,
 ) {
 
@@ -65,7 +66,7 @@ fun <T : Any> RefreshableScaffoldPagingList(
     )
 
     val dividerBrush = Brush.linearGradient(
-        colors = listOf<Color>(
+        colors = listOf(
             Color.Transparent,
             DividerDefaults.color
         )
@@ -127,7 +128,11 @@ fun <T : Any> RefreshableScaffoldPagingList(
                 .padding(innerPaddingValues),
             isRefreshing = items.loadState.refresh is LoadState.Loading,
             indicator = { pullRefreshIndicator() },
-            onRefresh = { items.refresh() },
+            onRefresh = {
+                onRefresh()
+
+                items.refresh()
+            },
             state = pullRefreshState
         ) {
             Column {

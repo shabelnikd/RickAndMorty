@@ -139,7 +139,6 @@ class CharactersListScreenVM(
     val favoritesListState =
         _favoritesSheetVisible
             .filterNotNull()
-            .distinctUntilChanged()
             .flatMapLatest { isVisible ->
                 if (isVisible) {
 

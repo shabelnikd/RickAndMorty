@@ -29,4 +29,6 @@ data class CharacterDto(
     val url: String? = null,
     @SerialName("created")
     val created: String? = null
+
 )
+

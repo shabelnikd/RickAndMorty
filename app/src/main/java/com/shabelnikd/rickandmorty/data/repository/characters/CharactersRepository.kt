@@ -28,7 +28,7 @@ class CharactersRepository(
     ): Flow<PagingData<CharacterModel>> = Pager(
         config = PagingConfig(
             pageSize = 20,
-            prefetchDistance = 40,
+            prefetchDistance = 10,
             enablePlaceholders = false
         ),
         pagingSourceFactory = {

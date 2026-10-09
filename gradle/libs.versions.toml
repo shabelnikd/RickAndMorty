@@ -1,23 +1,24 @@
 [versions]
-agp = "8.9.2"
-coilCompose = "3.1.0"
-composeShimmer = "1.3.2"
-kotlin = "2.1.20"
-coreKtx = "1.16.0"
+agp = "8.11.2"
+coilCompose = "3.3.0"
+composeShimmer = "1.3.3"
+haze = "1.7.1"
+kotlin = "2.3.0"
+coreKtx = "1.17.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-kotlinxSerializationJson = "1.8.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.1"
-composeBom = "2025.04.01"
-ktor = "3.1.2"
-coroutines = "1.10.1"
-lottieCompose = "6.6.6"
-navigationCompose = "2.8.9"
-pagingRuntimeKtx = "3.3.6"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+kotlinxSerializationJson = "1.10.0"
+lifecycleRuntimeKtx = "2.10.0"
+activityCompose = "1.12.3"
+composeBom = "2026.01.01"
+ktor = "3.4.0"
+coroutines = "1.10.2"
+lottieCompose = "6.7.1"
+navigationCompose = "2.9.7"
+pagingRuntimeKtx = "3.4.0"
 paletteKtx = "1.0.0"
-roomVersion = "2.7.1"
+roomVersion = "2.8.4"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,8 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCo
 coil-network-cache-control = { module = "io.coil-kt.coil3:coil-network-cache-control", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 compose-shimmer = { module = "com.valentinilk.shimmer:compose-shimmer", version.ref = "composeShimmer" }
+haze = { module = "dev.chrisbanes.haze:haze", version.ref = "haze" }
+haze-materials = { module = "dev.chrisbanes.haze:haze-materials", version.ref = "haze" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

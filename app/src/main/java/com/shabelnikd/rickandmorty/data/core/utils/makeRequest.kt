@@ -95,11 +95,22 @@ suspend inline fun <reified S> HttpClient.makeRequest(
                     HttpStatusCode.NotFound -> NetworkError.NotFound(errorBody, e)
                     HttpStatusCode.UnprocessableEntity -> NetworkError.InputValidation(errorBody, e)
                     // Другие клиентские ошибки (4xx), которые привели к ClientRequestException
-                    else -> NetworkError.ClientError(
-                        e.response.status.value,
-                        errorBody,
-                        e // Передаем оригинальное ClientRequestException как причину
-                    )
+                    else -> when (e.response.status.value) {
+                        in 400..499 -> NetworkError.ClientError(
+                            e.response.status.value,
+                            errorBody
+                        )
+
+                        in 500..599 -> NetworkError.ServerError(
+                            e.response.status.value,
+                            errorBody
+                        )
+                        // Все остальные статусы (1xx, 3xx, >=600)
+                        else -> NetworkError.Unexpected(
+                            "Неизвестный HTTP статус: ${e.response.status.value}",
+                            null
+                        )
+                    }
                 }
             }
 

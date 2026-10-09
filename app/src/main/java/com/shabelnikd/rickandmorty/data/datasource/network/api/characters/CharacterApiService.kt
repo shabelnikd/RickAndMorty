@@ -45,7 +45,6 @@ class CharacterApiService(
         type.takeUnless { it.isNullOrBlank() }?.let {
             parameter("type", it)
         }
-
     }
 
 

@@ -50,14 +50,10 @@ fun BottomNavBar(
                     navController.navigate(item.route, navOptions)
                 },
                 icon = {
-                    ImageVector.runCatching {
-                        Icon(
-                            imageVector = vectorResource(item.iconResId),
-                            contentDescription = item.name
-                        )
-                    }.onFailure {
-
-                    }
+                    Icon(
+                        imageVector = ImageVector.vectorResource(item.iconResId),
+                        contentDescription = item.name
+                    )
 
                 },
                 label = {
